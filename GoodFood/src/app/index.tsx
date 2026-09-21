@@ -3,7 +3,7 @@ import { Text, View, StyleSheet } from "react-native";
 export default function Index() {
 	return (
 		<View style={styles.container}>
-			<Text>Wow I have changed the text</Text>
+			<Text>Wow I have changed the texty</Text>
 		</View>
 	);
 }
