@@ -9,13 +9,13 @@ import {
 	View /*grupperar, strukturerar och stylar andra komponenter*/
 } from "react-native";
 
-const categories = ["All", "Breakfast", "Lunch", "Dinner", "Light meal", "Snack"];
+const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
 
 const recipes = [
   {
     id: 1,
     title: "Creamy Garlic Chicken",
-    category: "Dinner",
+    category: "Lunch & Dinner",
     calories: 520, /*skrivs över med beräkning nedan om felaktigt*/
     protein: 35,
     carbs: 20,
@@ -35,7 +35,7 @@ const recipes = [
   {
     id: 3,
     title: "Mediterranean Bowl",
-    category: "Vegetarian",
+    category: "Lunch & Dinner",
     calories: 430,
     protein: 20,
     carbs: 50,
@@ -46,13 +46,13 @@ const recipes = [
 
 ];
 
-export default function HomeScreen() { 
-  const [selectedCategory, setSelectedCategory] = React.useState("All");
+export default function HomeScreen() { /*returnerar det som ska synas*/
+  const [selectedCategory /*vald knapp*/, setSelectedCategory/*utlösare, ändra det som syns*/] = React.useState("All"); /*skapa nytt minne, default är "All"*/
 
-  const filteredRecipes =
-    selectedCategory === "All"
-      ? recipes
-      : recipes.filter((recipe) => recipe.category === selectedCategory);
+  const filteredRecipes = /*filtreringsmöjlighet*/
+    selectedCategory === "All" /*== jämför värden, === jämför värden och datatyp*/
+      ? /* om sant */ recipes
+      : /* gör detta */recipes.filter((recipe) /* gå igenom listan */ => recipe.category /*enskilt recept*/ === selectedCategory /*om receptets kategori är sant*/);
 
   return (
     <SafeAreaView> 
