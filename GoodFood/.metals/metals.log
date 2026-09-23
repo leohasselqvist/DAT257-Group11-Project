@@ -1,0 +1,13 @@
+2026.09.23 13:38:47 INFO  Started: Metals version 1.6.9 in folders 'C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood' for client Visual Studio Code 1.138.0.
+2026.09.23 13:38:47 INFO  Memory monitor started
+2026.09.23 13:38:49 WARN  Using H2 2.5.250 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.09.23 13:38:50 INFO  no build target found for C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood\src\app\backend\API\recepies.java. Using fallback presentation compiler.
+2026.09.23 13:38:50 WARN  no build tool detected in workspace 'C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2026.09.23 13:38:50 WARN  Build server is not auto-connectable.
+2026.09.23 13:38:51 WARN  no build target for: C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood\src\app\backend\API\recepies.java
+2026.09.23 13:38:51 INFO  no build target found for C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood\src\app\backend\API\recepies.java. Using fallback presentation compiler.
+2026.09.23 13:38:52 WARN  Running javac-semanticdb failed for file:///C:/Users/wicks/Prog/agil/DAT257-Group11-Project/GoodFood/src/app/backend/API/recepies.java. Output:
+
+2026.09.23 13:38:52 INFO  time: code lens generation in 1.22s
+2026.09.23 13:38:57 INFO  no build target found for C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood\src\app\backend\API\recepies.java. Using fallback presentation compiler.
+2026.09.23 13:39:13 INFO  no build target found for C:\Users\wicks\Prog\agil\DAT257-Group11-Project\GoodFood\src\app\backend\API\recepies.java. Using fallback presentation compiler.
