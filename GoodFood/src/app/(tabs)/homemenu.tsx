@@ -80,7 +80,7 @@ export default function HomeScreen() { /*returnerar det som ska synas*/
         <View>
           <Text>Recommended recipes</Text>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedCategory("All")}>
             <Text>See all</Text>
           </TouchableOpacity>
         </View>
@@ -99,7 +99,7 @@ export default function HomeScreen() { /*returnerar det som ska synas*/
                   {recipe.time} {"\n"}
 
                   {recipe.protein && recipe.carbs && recipe.fat
-                    ? /*om detta är sant gör följande*/(recipe.protein * 4) + (recipe.carbs * 4) + (recpie.fat * 9)
+                    ? /*om detta är sant gör följande*/(recipe.protein * 4) + (recipe.carbs * 4) + (recipe.fat * 9)
                     : /*annars gör detta*/ recipe.calories} kcal {"\n" /*ny rad*/} 
 
                   {recipe.protein /*om receptet har protein*/ && /*om sant går vidare*/ `${recipe.protein}g protein` /*skriv ut texten*/}
@@ -114,3 +114,5 @@ export default function HomeScreen() { /*returnerar det som ska synas*/
     </SafeAreaView>
   );
 }
+
+
