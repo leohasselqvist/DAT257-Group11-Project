@@ -6,21 +6,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'index',
+          title: 'Home',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'profile',
+          title: 'Profile',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
         }}
       />
       <Tabs.Screen
       name="recipes"
       options={{
-        title: 'recipes ',
+        title: 'Recipes',
+        tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+      }}
+      />
+      <Tabs.Screen
+      name="favorites"
+      options={{
+        title: 'Favorites',
         tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
       }}
       />
