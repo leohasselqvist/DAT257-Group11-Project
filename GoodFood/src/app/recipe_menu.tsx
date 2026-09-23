@@ -1,4 +1,4 @@
-import { View, FlatList, StyleSheet, Text } from "react-native";
+import { View, FlatList, StyleSheet, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const RECIPES = [
@@ -7,12 +7,18 @@ const RECIPES = [
     { id: "3", title: "Greek salad" },
 ];
 
-type RecipeItemProps = { title: string };
+type RecipeItemProps = { title: string; onPress: () => void };
 
-const RecipeItem = ({ title }: RecipeItemProps) => (
-    <View style={styles.recipe_list_item}>
+const RecipeItem = ({ title, onPress }: RecipeItemProps) => (
+    <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+            styles.recipe_list_item,
+            pressed && styles.recipe_list_item_pressed,
+        ]}
+    >
         <Text style={styles.title}>{title}</Text>
-    </View>
+    </Pressable>
 );
 
 export default function RecipeMenu() {
@@ -21,7 +27,9 @@ export default function RecipeMenu() {
             <FlatList
                 data={RECIPES}
                 renderItem={({ item }) => (
-                    <RecipeItem title={item.title} />
+                    <RecipeItem title={item.title}
+                    onPress={() => alert('You pressed a button.')}
+                    />
                 )}
             />
         </SafeAreaView>
@@ -44,8 +52,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 20,
     },
-    subtitle: {
-        color: "#9aa0a6",
-        marginTop: 4,
+    recipe_list_item_pressed: {
+        opacity: 0.6,
     },
 });
