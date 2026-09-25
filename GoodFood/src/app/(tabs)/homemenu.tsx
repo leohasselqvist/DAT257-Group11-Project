@@ -1,12 +1,12 @@
 import React from "react";
 import {
-	SafeAreaView, /*inte krockar med hårdvara och mjukvara*/
-  /*Borde vi ha en SafeAreaProvider? */
-	ScrollView, /*möjliggör scroll*/
-	Text, /*visa och styla text*/
-	TextInput, /*inmatning*/
-	TouchableOpacity, /*osynlig knapp som tonar*/
-	View /*grupperar, strukturerar och stylar andra komponenter*/
+	SafeAreaView,             /*inte krockar med hårdvara och mjukvara*/
+                            /*Borde vi ha en SafeAreaProvider? */
+	ScrollView,               /*möjliggör scroll*/
+	Text,                     /*visa och styla text*/
+	TextInput,                /*inmatning*/
+	TouchableOpacity,         /*osynlig knapp som tonar*/
+	View                      /*grupperar, strukturerar och stylar andra komponenter*/
 } from "react-native";
 
 const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
@@ -16,7 +16,7 @@ const recipes = [
     id: 1,
     title: "Creamy Garlic Chicken",
     category: "Lunch & Dinner",
-    calories: 520, /*skrivs över med beräkning nedan om felaktigt*/
+    calories: 520,          /*skrivs över med beräkning nedan om felaktigt*/
     protein: 35,
     carbs: 20,
     fat: 30,
@@ -46,13 +46,13 @@ const recipes = [
 
 ];
 
-export default function HomeScreen() { /*returnerar det som ska synas*/
-  const [selectedCategory /*vald knapp*/, setSelectedCategory/*utlösare, ändra det som syns*/] = React.useState("All"); /*skapa nytt minne, default är "All"*/
+export default function HomeScreen() {                                      /*returnerar det som ska synas*/
+  const [selectedCategory, setSelectedCategory] = React.useState("All");    /*vald knapp*/ /*utlösare, ändra det som syns*/ /*skapa nytt minne, default är "All"*/
 
-  const filteredRecipes = /*filtreringsmöjlighet*/
-    selectedCategory === "All" /*== jämför värden, === jämför värden och datatyp*/
-      ? /* om sant */ recipes
-      : /* gör detta */recipes.filter((recipe) /* gå igenom listan */ => recipe.category /*enskilt recept*/ === selectedCategory /*om receptets kategori är sant*/);
+  const filteredRecipes =                                                   /*filtreringsmöjlighet*/
+    selectedCategory === "All"                                              /*== jämför värden, === jämför värden och datatyp*/
+      ? recipes                                                             /* om sant */
+      : recipes.filter((recipe) => recipe.category === selectedCategory );  /* gör detta */ /* gå igenom listan */ /*enskilt recept*/ /*om receptets kategori är sant*/
 
   return (
     <SafeAreaView> 
@@ -68,9 +68,9 @@ export default function HomeScreen() { /*returnerar det som ska synas*/
         <ScrollView horizontal /*scrollar i sidled*/ showsHorizontalScrollIndicator={false} /*visar ej att det går att scrolla med en scrollbar*/> 
           {categories.map((category) => (
             <TouchableOpacity 
-              key={category} /*knappens namn*/
-              activeOpacity = {0.2} /*annorlunda för mindre knappar - tydlig blinkning*/
-              onPress={() => setSelectedCategory(category)} /*onPress säger vad som ska väljas*/
+              key={category}                                                                /*knappens namn*/
+              activeOpacity = {0.2}                                                         /*annorlunda för mindre knappar - tydlig blinkning*/
+              onPress={() => setSelectedCategory(category)}                                 /*onPress säger vad som ska väljas*/
             >
               <Text>{category}</Text>
             </TouchableOpacity>
@@ -88,8 +88,8 @@ export default function HomeScreen() { /*returnerar det som ska synas*/
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {filteredRecipes.map((recipe) => (
             <TouchableOpacity 
-              key={recipe.id} /*knappens namn*/
-              activeOpacity={0.85} /*default värde på opacity enligt standard på hemsida, jobbigt om stor knapp lyser mycket*/> 
+              key={recipe.id}                                               /*knappens namn*/
+              activeOpacity={0.85}                                          /*default värde på opacity enligt standard på hemsida, jobbigt om stor knapp lyser mycket*/> 
               <View>
                 <Text>{recipe.category}</Text>
 
@@ -99,10 +99,10 @@ export default function HomeScreen() { /*returnerar det som ska synas*/
                   {recipe.time} {"\n"}
 
                   {recipe.protein && recipe.carbs && recipe.fat
-                    ? /*om detta är sant gör följande*/(recipe.protein * 4) + (recipe.carbs * 4) + (recipe.fat * 9)
-                    : /*annars gör detta*/ recipe.calories} kcal {"\n" /*ny rad*/} 
+                    ? (recipe.protein * 4) + (recipe.carbs * 4) + (recipe.fat * 9) /*om detta är sant gör följande*/
+                    : recipe.calories} kcal {"\n"}                                 {/*annars gör detta*/ /*ny rad*/}
 
-                  {recipe.protein /*om receptet har protein*/ && /*om sant går vidare*/ `${recipe.protein}g protein` /*skriv ut texten*/}
+                  {recipe.protein && `${recipe.protein}g protein`         /*om receptet har protein*/ /*om sant går vidare*/ /*skriv ut texten*/}
                   {recipe.carbs && ` | ${recipe.carbs}g carbs`}
                   {recipe.fat && ` | ${recipe.fat}g fat`}
                 </Text>
