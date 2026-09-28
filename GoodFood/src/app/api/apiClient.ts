@@ -1,6 +1,10 @@
 import { Header } from "expo-router/build/react-navigation";
 import { dietlyApiKey } from "./secret" // IF YOU GET AN ERROR HERE DM LEO
 
+// Api Client
+
+// The lowest level of the API layers, sending base requests without 
+
 export async function FetchDietly<T>(endpoint: string, params?: RequestInit) {
   const dietlyBaseURL = 'https://api.getdietly.com/';
   const r = await fetch(

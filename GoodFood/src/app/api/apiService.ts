@@ -7,7 +7,7 @@ export namespace DietlyAPI {
   }
 
   export function Popular() {
-    return FetchDietly<APIResponse<FoodProps[]>>("popular");
+    return FetchDietly<APIResponse<FoodProps[]>>("foods/popular");
   }
 }
 
