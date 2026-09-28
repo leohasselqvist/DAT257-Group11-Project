@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+
 const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
 
 const recipes = [
@@ -86,30 +87,42 @@ function RecipeMenu({ items }: { items : typeof recipes }) {
 
 export default function HomeScreen() {                                      /*returnerar det som ska synas*/
   const [selectedCategory, setSelectedCategory] = React.useState("All");    /*vald knapp*/ /*utlösare, ändra det som syns*/ /*skapa nytt minne, default är "All"*/
+  const [searchQuery, setSearchQuery] = React.useState("");
 
-  const filteredRecipes =                                                   /*filtreringsmöjlighet*/
-    selectedCategory === "All"                                              /*== jämför värden, === jämför värden och datatyp*/
-      ? recipes                                                             /* om sant */
-      : recipes.filter((recipe) => recipe.category === selectedCategory );  /* gör detta */ /* gå igenom listan */ /*enskilt recept*/ /*om receptets kategori är sant*/
+  const filteredRecipes = recipes.filter((recipe) =>
+    (selectedCategory === "All" || recipe.category === selectedCategory) &&
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <SafeAreaView> 
+    <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
         </View>
 
         <View>
-          <TextInput placeholder="Search recipes, ingredients..." />
+          <TextInput
+          style={styles.searchBar}
+          placeholder="Search recipes..."
+          placeholderTextColor="#9A9D96"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          />
         </View>
 
         <ScrollView horizontal /*scrollar i sidled*/ showsHorizontalScrollIndicator={false} /*visar ej att det går att scrolla med en scrollbar*/> 
           <View style={styles.buttonGap}>
             {categories.map((category) => (
-              <TouchableOpacity 
-                key={category}                                                                /*knappens namn*/
-                activeOpacity = {0.2}                                                         /*annorlunda för mindre knappar - tydlig blinkning*/
-                onPress={() => setSelectedCategory(category)}                                 /*onPress säger vad som ska väljas*/
+              <TouchableOpacity
+                key={category}  /*knappens namn*/
+                activeOpacity = {0.2} /*annorlunda för mindre knappar - tydlig blinkning*/
+                onPress={() => {  /*onPress säger vad som ska väljas*/
+                  setSelectedCategory(category)
+                  if (category === "All") {
+                    setSearchQuery("");
+                  }
+                }}
               >
                 <Text style={styles.categoryButton}>{category}</Text>
               </TouchableOpacity>
@@ -207,5 +220,16 @@ const styles = StyleSheet.create({
     padding: 6,
     gap: 6,
     flexDirection: "row",
+  },
+  searchBar: {
+    marginHorizontal: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#ECEDE8",
+    fontSize: 15,
+    color: "#252824",
   }
 });
