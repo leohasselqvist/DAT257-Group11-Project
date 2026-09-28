@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
-import { dietlyApiKey } from "../api/secret";
+import { Search } from "../api/dietly";
 
 export default function ApiTesting() {
-	interface foodProps {
+	/*interface foodProps {
 		id: number;
 		name: string;
 		brand: string;
@@ -40,10 +39,15 @@ export default function ApiTesting() {
 		const s = search();
 		setSearchResult(s?.T);
 	}, []);
+	*/
+
+	const { searchResults, setSearchResult } = useState("");
+
+	const { foods } = Search(searchResults, 20);
 
 	return (
 		<View style={styles.container}>
-			<Text>{searchResult?.brand}</Text>
+			<Text>{foods?.brand}</Text>
 		</View>
 	);
 }
