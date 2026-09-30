@@ -1,6 +1,7 @@
 import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
-	SafeAreaView,             /*inte krockar med hårdvara och mjukvara*/
+	/*SafeAreaView,             /*inte krockar med hårdvara och mjukvara*/
                             /*Borde vi ha en SafeAreaProvider? */
 	ScrollView,               /*möjliggör scroll*/
 	Text,                     /*visa och styla text*/
