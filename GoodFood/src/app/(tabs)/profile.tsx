@@ -27,7 +27,7 @@ const TextInputExample = () => {
               }}
             >
             
-              Profilinformation 
+              Profile Information
             </Text>
 
             <TextInput
