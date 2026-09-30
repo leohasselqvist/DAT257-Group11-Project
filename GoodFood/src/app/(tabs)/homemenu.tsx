@@ -59,7 +59,8 @@ export default function HomeScreen() {                                      /*re
     <SafeAreaView> 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
-          <Text>Welcome, what recipes are you interested in?</Text>
+          <Text>
+            Welcome, what recipes are you interested in?</Text>
         </View>
 
         <View>
