@@ -22,7 +22,7 @@ const TextInputExample = () => {
                 fontWeight: 'bold', 
                 marginBottom: 10,
                 marginTop: 20,
-                color: '#0e87f0f6',
+                color: '#ffc404f6',
 
               }}
             >
@@ -63,6 +63,8 @@ const TextInputExample = () => {
           <Button
             title ={isEditing ? 'Spara' : 'Ändra information'}
             onPress={() => setIsEditing(!isEditing)}
+            color = '#ffc404f6'
+
           />
 
         </ScrollView>
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#cae1f7',
+    backgroundColor: '#ddbb3e27',
   },
 
 input: {
@@ -85,7 +87,7 @@ input: {
   borderWidth: 1,
   padding: 10,
   borderRadius: 10, 
-  backgroundColor: '#0e87f0f6',
+  backgroundColor: '#ffc404f6',
   color: 'white',
   borderColor: 'white',
 }
