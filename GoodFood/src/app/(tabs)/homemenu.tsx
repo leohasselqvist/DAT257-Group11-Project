@@ -44,6 +44,106 @@ const recipes = [
     fat: 15,
     time: "20 min",
   },
+  {
+    id: 4,
+    title: "Greek Yogurt Parfait",
+    category: "Breakfast",
+    calories: 280,
+    protein: 18,
+    carbs: 35,
+    fat: 7,
+    time: "5 min",
+  },
+  {
+    id: 5,
+    title: "Blueberry Oatmeal",
+    category: "Breakfast",
+    calories: 350,
+    protein: 12,
+    carbs: 58,
+    fat: 8,
+    time: "10 min",
+  },
+  {
+    id: 6,
+    title: "Chicken Caesar Wrap",
+    category: "Light meal",
+    calories: 410,
+    protein: 30,
+    carbs: 35,
+    fat: 18,
+    time: "15 min",
+  },
+  {
+    id: 7,
+    title: "Tomato Basil Soup",
+    category: "Light meal",
+    calories: 220,
+    protein: 6,
+    carbs: 28,
+    fat: 10,
+    time: "25 min",
+  },
+  {
+    id: 8,
+    title: "Spaghetti Bolognese",
+    category: "Lunch & Dinner",
+    calories: 610,
+    protein: 32,
+    carbs: 70,
+    fat: 22,
+    time: "40 min",
+  },
+  {
+    id: 9,
+    title: "Salmon with Roasted Veggies",
+    category: "Lunch & Dinner",
+    calories: 480,
+    protein: 38,
+    carbs: 22,
+    fat: 26,
+    time: "25 min",
+  },
+  {
+    id: 10,
+    title: "Veggie Stir-Fry with Tofu",
+    category: "Lunch & Dinner",
+    calories: 390,
+    protein: 22,
+    carbs: 40,
+    fat: 16,
+    time: "20 min",
+  },
+  {
+    id: 11,
+    title: "Apple Slices with Peanut Butter",
+    category: "Snack",
+    calories: 200,
+    protein: 6,
+    carbs: 22,
+    fat: 11,
+    time: "5 min",
+  },
+  {
+    id: 12,
+    title: "Hummus and Carrot Sticks",
+    category: "Snack",
+    calories: 180,
+    protein: 6,
+    carbs: 20,
+    fat: 9,
+    time: "5 min",
+  },
+  {
+    id: 13,
+    title: "Homemade Granola Bar",
+    category: "Snack",
+    calories: 240,
+    protein: 7,
+    carbs: 30,
+    fat: 11,
+    time: "30 min",
+  },
 
 
 ];
@@ -130,16 +230,18 @@ export default function HomeScreen() {                                      /*re
           </View>
         </ScrollView>
 
-        <View>
+        <ScrollView>
           <Text style={styles.recommended}>Recommended recipes</Text>
           {/*
           <TouchableOpacity onPress={() => setSelectedCategory("All")}>
             <Text>See all</Text>
           </TouchableOpacity>
           */}
-        </View>
-        <RecipeMenu items={filteredRecipes}
-        />
+        </ScrollView>
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <RecipeMenu items={filteredRecipes}></RecipeMenu>
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
