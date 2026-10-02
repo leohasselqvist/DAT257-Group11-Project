@@ -1,7 +1,11 @@
-import { Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs } from 'expo-router';
+import { FavoritesProvider } from '../../contexts/FavoritesContext';
 export default function TabLayout() {
   return (
+    /*Ger alla flikar som ligger innanför favoritstates*/
+    <FavoritesProvider> 
+  
     <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
       <Tabs.Screen
         name="index"
@@ -32,5 +36,6 @@ export default function TabLayout() {
       }}
       />
     </Tabs>
+    </FavoritesProvider>
   );
 }

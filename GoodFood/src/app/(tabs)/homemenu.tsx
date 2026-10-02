@@ -1,59 +1,40 @@
 import React from "react";
 import {
-	SafeAreaView,             /*inte krockar med hårdvara och mjukvara*/
-                            /*Borde vi ha en SafeAreaProvider? */
-	ScrollView,               /*möjliggör scroll*/
-	Text,                     /*visa och styla text*/
-	TextInput,                /*inmatning*/
-	TouchableOpacity,         /*osynlig knapp som tonar*/
-	View                      /*grupperar, strukturerar och stylar andra komponenter*/
-} from "react-native";
+  SafeAreaView, /*inte krockar med hårdvara och mjukvara*/
 
+
+
+
+
+
+
+  /*Borde vi ha en SafeAreaProvider? */
+  ScrollView, /*möjliggör scroll*/
+  Text, /*visa och styla text*/
+  TextInput, /*inmatning*/
+  TouchableOpacity, /*osynlig knapp som tonar*/
+  View /*grupperar, strukturerar och stylar andra komponenter*/
+} from "react-native";
+import { FavoritesContext } from "../../contexts/FavoritesContext";
+import { recipes } from "../../data/recipes";
 const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
 
-const recipes = [
-  {
-    id: 1,
-    title: "Creamy Garlic Chicken",
-    category: "Lunch & Dinner",
-    calories: 520,          /*skrivs över med beräkning nedan om felaktigt*/
-    protein: 35,
-    carbs: 20,
-    fat: 30,
-    time: "30 min",
-  },
-  {
-    id: 2,
-    title: "Avocado Egg Toast",
-    category: "Breakfast",
-    calories: 340,
-    protein: 15,
-    carbs: 25,
-    fat: 10,
-    time: "10 min",
-  },
-  {
-    id: 3,
-    title: "Mediterranean Bowl",
-    category: "Lunch & Dinner",
-    calories: 430,
-    protein: 20,
-    carbs: 50,
-    fat: 15,
-    time: "20 min",
-  },
-
-
-];
 
 export default function HomeScreen() {                                      /*returnerar det som ska synas*/
-  const [selectedCategory, setSelectedCategory] = React.useState("All");    /*vald knapp*/ /*utlösare, ändra det som syns*/ /*skapa nytt minne, default är "All"*/
-
+  const [selectedCategory, setSelectedCategory] = React.useState("All");    /*vald knapp*/ /*utlösare, ändra det som 
+  syns*/ /*skapa nytt minne, default är "All"*/
+  const favorites = React.useContext(FavoritesContext); /*Hämtar favoritdata från context*/
+   if (!favorites) {
+    throw new Error("FavoritesContext missing");
+  }/*Stoppar med ett felmeddelande om FavoritesContext saknas*/
+  const { likedIds, setLikedIds } = favorites; /*Hämtar likedIds och setLikedIds från favorites*/
   const filteredRecipes =                                                   /*filtreringsmöjlighet*/
     selectedCategory === "All"                                              /*== jämför värden, === jämför värden och datatyp*/
       ? recipes                                                             /* om sant */
       : recipes.filter((recipe) => recipe.category === selectedCategory );  /* gör detta */ /* gå igenom listan */ /*enskilt recept*/ /*om receptets kategori är sant*/
+ 
 
+  
   return (
     <SafeAreaView> 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -94,7 +75,13 @@ export default function HomeScreen() {                                      /*re
                 <Text>{recipe.category}</Text>
 
                 <Text numberOfLines={2}>{recipe.title}</Text>
-
+                <TouchableOpacity onPress={() => {if (likedIds.includes(recipe.id)) {
+                  setLikedIds(likedIds.filter((id) => id !== recipe.id)); /*Toggle off hjärta*/
+                } else {
+                  setLikedIds([...likedIds, recipe.id]); /*Toggle on hjärta*/
+                }}}>
+                  <Text style={{ fontSize: 28, color: likedIds.includes(recipe.id) ? "red" : "gray" }}>♡</Text>
+                </TouchableOpacity>
                 <Text>
                   {recipe.time} {"\n"}
 
