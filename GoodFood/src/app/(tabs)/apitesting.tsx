@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
-import { Search } from "../api/dietly";
+import { useState } from "react"
+import { Popular, Search } from "../../api/dietly"; // Step 1 Import the functions you want
 
 export default function ApiTesting() {
 	/*interface foodProps {
@@ -41,13 +42,15 @@ export default function ApiTesting() {
 	}, []);
 	*/
 
-	const { searchResults, setSearchResult } = useState("");
+	const { foods } = Popular(); // step 2, create a prop using the function
 
-	const { foods } = Search(searchResults, 20);
+	// Step 3, use conditionals to show the prop, eg. {PROP HERE ? (WHAT TO DO WHEN IT IS THERE)) : (WHAT TO DO WHEN IT IS LOADING OR FAILED)}
 
 	return (
-		<View style={styles.container}>
-			<Text>{foods?.brand}</Text>
+		<View>
+			<Text>
+				{foods ? (foods[0].name) : ("Something went wrong.")}
+			</Text>
 		</View>
 	);
 }
