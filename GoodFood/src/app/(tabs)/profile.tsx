@@ -1,4 +1,4 @@
-import { View, Button, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable } from 'react-native';
 import { useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -22,7 +22,7 @@ const TextInputExample = () => {
                 fontWeight: 'bold', 
                 marginBottom: 10,
                 marginTop: 20,
-                color: '#ffc404f6',
+                color: '#e0d0b8e2',
 
               }}
             >
@@ -32,6 +32,7 @@ const TextInputExample = () => {
 
             <TextInput
               style={styles.input}
+              placeholder="First Name"
               value = {firstName}
               onChangeText={setFirstName}
               editable={isEditing}
@@ -39,6 +40,7 @@ const TextInputExample = () => {
 
             <TextInput
               style={styles.input}
+              placeholder="Last Name"
               value = {lastName}
               onChangeText={setLastName}
               editable={isEditing}
@@ -46,6 +48,7 @@ const TextInputExample = () => {
 
             <TextInput
               style={styles.input}
+              placeholder="Email"
               value = {email}
               onChangeText={setEmail}
               editable={isEditing}
@@ -53,6 +56,7 @@ const TextInputExample = () => {
 
             <TextInput
               style={styles.input}
+              placeholder="Password"
               value = {password}
               onChangeText={setPassword}
               editable={isEditing}
@@ -63,7 +67,7 @@ const TextInputExample = () => {
           <Button
             title ={isEditing ? 'Spara' : 'Ändra information'}
             onPress={() => setIsEditing(!isEditing)}
-            color = '#ffc404f6'
+            color = '#e4a03a6a'
 
           />
 
@@ -78,7 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ddbb3e27',
+    backgroundColor: '#e48c3af6',
   },
 
 input: {
@@ -87,7 +91,7 @@ input: {
   borderWidth: 1,
   padding: 10,
   borderRadius: 10, 
-  backgroundColor: '#ffc404f6',
+  backgroundColor: '#e48c3af6',
   color: 'white',
   borderColor: 'white',
 }
