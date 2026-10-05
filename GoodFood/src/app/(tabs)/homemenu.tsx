@@ -1,337 +1,221 @@
-import React from "react";
-import {
-	ScrollView,               /*möjliggör scroll*/
-	Text,                     /*visa och styla text*/
-	TextInput,                /*inmatning*/
-	TouchableOpacity,         /*osynlig knapp som tonar*/
-	View,                      /*grupperar, strukturerar och stylar andra komponenter*/
-  StyleSheet,
-  Pressable,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+  import React from "react";
+  import { useContext } from "react";
+  import {
+    ScrollView,               /*möjliggör scroll*/
+    Text,                     /*visa och styla text*/
+    TextInput,                /*inmatning*/
+    TouchableOpacity,         /*osynlig knapp som tonar*/
+    View,                      /*grupperar, strukturerar och stylar andra komponenter*/
+    StyleSheet,
+    Pressable,
+  } from "react-native";
+  import { FavoritesContext } from "../../contexts/FavoritesContext";
+  import { recipes } from "../../data/recipes";import { SafeAreaView } from "react-native-safe-area-context";
 
 
-const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
-
-const recipes = [
-  {
-    id: 1,
-    title: "Creamy Garlic Chicken",
-    category: "Lunch & Dinner",
-    calories: 520,          /*skrivs över med beräkning nedan om felaktigt*/
-    protein: 35,
-    carbs: 20,
-    fat: 30,
-    time: "30 min",
-  },
-  {
-    id: 2,
-    title: "Avocado Egg Toast",
-    category: "Breakfast",
-    calories: 340,
-    protein: 15,
-    carbs: 25,
-    fat: 10,
-    time: "10 min",
-  },
-  {
-    id: 3,
-    title: "Mediterranean Bowl",
-    category: "Lunch & Dinner",
-    calories: 430,
-    protein: 20,
-    carbs: 50,
-    fat: 15,
-    time: "20 min",
-  },
-  {
-    id: 4,
-    title: "Greek Yogurt Parfait",
-    category: "Breakfast",
-    calories: 280,
-    protein: 18,
-    carbs: 35,
-    fat: 7,
-    time: "5 min",
-  },
-  {
-    id: 5,
-    title: "Blueberry Oatmeal",
-    category: "Breakfast",
-    calories: 350,
-    protein: 12,
-    carbs: 58,
-    fat: 8,
-    time: "10 min",
-  },
-  {
-    id: 6,
-    title: "Chicken Caesar Wrap",
-    category: "Light meal",
-    calories: 410,
-    protein: 30,
-    carbs: 35,
-    fat: 18,
-    time: "15 min",
-  },
-  {
-    id: 7,
-    title: "Tomato Basil Soup",
-    category: "Light meal",
-    calories: 220,
-    protein: 6,
-    carbs: 28,
-    fat: 10,
-    time: "25 min",
-  },
-  {
-    id: 8,
-    title: "Spaghetti Bolognese",
-    category: "Lunch & Dinner",
-    calories: 610,
-    protein: 32,
-    carbs: 70,
-    fat: 22,
-    time: "40 min",
-  },
-  {
-    id: 9,
-    title: "Salmon with Roasted Veggies",
-    category: "Lunch & Dinner",
-    calories: 480,
-    protein: 38,
-    carbs: 22,
-    fat: 26,
-    time: "25 min",
-  },
-  {
-    id: 10,
-    title: "Veggie Stir-Fry with Tofu",
-    category: "Lunch & Dinner",
-    calories: 390,
-    protein: 22,
-    carbs: 40,
-    fat: 16,
-    time: "20 min",
-  },
-  {
-    id: 11,
-    title: "Apple Slices with Peanut Butter",
-    category: "Snack",
-    calories: 200,
-    protein: 6,
-    carbs: 22,
-    fat: 11,
-    time: "5 min",
-  },
-  {
-    id: 12,
-    title: "Hummus and Carrot Sticks",
-    category: "Snack",
-    calories: 180,
-    protein: 6,
-    carbs: 20,
-    fat: 9,
-    time: "5 min",
-  },
-  {
-    id: 13,
-    title: "Homemade Granola Bar",
-    category: "Snack",
-    calories: 240,
-    protein: 7,
-    carbs: 30,
-    fat: 11,
-    time: "30 min",
-  },
+  const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
 
 
-];
+  type RecipeItemProps = {  id: number; title: string; time: string; calories: number; protein: number; carbs: number; fat: number; onPress: () => void };
 
-type RecipeItemProps = { title: string; time: string; calories: number; protein: number; carbs: number; fat: number; onPress: () => void };
+  const RecipeItem = ({ id, title, time, calories, onPress }: RecipeItemProps) => {
+    const context = useContext(FavoritesContext);
+    if (!context) return null; // context is typed as possibly undefined
+    const { likedIds, setLikedIds } = context;
 
-const RecipeItem = ({ title, time, calories, onPress }: RecipeItemProps) => (
-  <Pressable
-    onPress={onPress}
-    style={({ pressed }) => [
-    styles.recipeCard,
-    pressed && styles.recipeCardPressed,
-    ]}
-  >
-    <View style={styles.recipeInfo}>
-    <Text style={styles.recipeTitle}>{title}</Text>
-    <Text style={styles.recipeCals}>{calories} kcal</Text>
-    <Text style={styles.recipeTime}>{time}</Text>
-    </View>
-  </Pressable>
-);
-
-function RecipeMenu({ items }: { items : typeof recipes }) {
-  return (
-    <View style={styles.grid}>
-      {items.map((item) => (
-      <RecipeItem
-        key={item.id}
-        title={item.title}
-        time={item.time}
-        calories={item.calories}
-        protein={item.protein}
-        carbs={item.carbs}
-        fat={item.fat}
-        onPress={() => alert(`${item.title} full macronutrient breakdown: \nCalories: ${item.calories} kcal \nProtein: ${item.protein}g \nCarbohydrates: ${item.carbs}g \nFat: ${item.fat}g`)}
-      />
-      ))}
-    </View>
-  );
-}
-
-export default function HomeScreen() {                                      /*returnerar det som ska synas*/
-  const [selectedCategory, setSelectedCategory] = React.useState("All");    /*vald knapp*/ /*utlösare, ändra det som syns*/ /*skapa nytt minne, default är "All"*/
-  const [searchQuery, setSearchQuery] = React.useState("");
-
-  const filteredRecipes = recipes.filter((recipe) =>
-    (selectedCategory === "All" || recipe.category === selectedCategory) &&
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <SafeAreaView>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View>
-          <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
+    return (
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+        styles.recipeCard,
+        pressed && styles.recipeCardPressed,
+        ]}
+      >
+        <View style={styles.recipeInfo}>
+        <Text style={styles.recipeTitle}>{title}</Text>
+        <Text style={styles.recipeCals}>{calories} kcal</Text>
+        <Text style={styles.recipeTime}>{time}</Text>
+        <TouchableOpacity onPress={() => {if (likedIds.includes(id)) {
+          setLikedIds(likedIds.filter((itemId) => itemId !== id)); /*Toggle off hjärta*/
+        } else {
+          setLikedIds([...likedIds, id]); /*Toggle on hjärta*/
+            }}}>
+            <Text style={{ fontSize: 28, color: likedIds.includes(id) ? "red" : "gray" }}>♡</Text>
+        </TouchableOpacity>
         </View>
+      </Pressable>
+    );
+  };
 
-        <View>
-          <TextInput
-          style={styles.searchBar}
-          placeholder="Search recipes..."
-          placeholderTextColor="#9A9D96"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          />
-        </View>
-
-        <ScrollView horizontal /*scrollar i sidled*/ showsHorizontalScrollIndicator={false} /*visar ej att det går att scrolla med en scrollbar*/> 
-          <View style={styles.buttonGap}>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category}  /*knappens namn*/
-                activeOpacity = {0.2} /*annorlunda för mindre knappar - tydlig blinkning*/
-                onPress={() => {  /*onPress säger vad som ska väljas*/
-                  setSelectedCategory(category)
-                  if (category === "All") {
-                    setSearchQuery("");
-                  }
-                }}
-              >
-                <Text style={styles.categoryButton}>{category}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
-
-        <ScrollView>
-          <Text style={styles.recommended}>Recommended recipes</Text>
-          {/*
-          <TouchableOpacity onPress={() => setSelectedCategory("All")}>
-            <Text>See all</Text>
-          </TouchableOpacity>
-          */}
-        </ScrollView>
-
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <RecipeMenu items={filteredRecipes}></RecipeMenu>
-        </ScrollView>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F8F5",
-  },
-  grid: {
-    padding: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 15,
-  },
-  recipeCard: {
-    width: 210,
-    height: 100,
-    borderRadius: 18,
-    backgroundColor: "#FFFFFF",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ECEDE8",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-  },
-  recipeCardPressed: {
-    opacity: 0.75,
-  },
-  recipeInfo: {
-    padding: 13,
-  },
-  recipeTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#252824",
-    lineHeight: 21,
-  },
-  recipeTime: {
-    fontSize: 13,
-    color: "#3a3f39",
-  },
-  recipeCals: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#3a3f39",
-  },
-  title: {
-    paddingHorizontal: 6,
-    fontSize: 24,
-    fontWeight: "900",
-    color: "#252824",
-  },
-  recommended: {
-    paddingHorizontal: 6,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#252824",
-  },
-  categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 30,
-    backgroundColor: "#FFFFFF",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ECEDE8",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-  },
-  buttonGap: {
-    padding: 6,
-    gap: 6,
-    flexDirection: "row",
-  },
-  searchBar: {
-    marginHorizontal: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderRadius: 30,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#ECEDE8",
-    fontSize: 15,
-    color: "#252824",
+  function RecipeMenu({ items }: { items : typeof recipes }) {
+    return (
+      <View style={styles.grid}>
+        {items.map((item) => (
+        <RecipeItem
+          id={item.id}
+          key={item.id}
+          title={item.title}
+          time={item.time}
+          calories={item.calories}
+          protein={item.protein}
+          carbs={item.carbs}
+          fat={item.fat}
+          onPress={() => alert(`${item.title} full macronutrient breakdown: \nCalories: ${item.calories} kcal \nProtein: ${item.protein}g \nCarbohydrates: ${item.carbs}g \nFat: ${item.fat}g`)}
+        />
+        ))}
+      </View>
+    );
   }
-});
+
+  export default function HomeScreen() {                                      /*returnerar det som ska synas*/
+    const [selectedCategory, setSelectedCategory] = React.useState("All");
+    const [searchQuery, setSearchQuery] = React.useState("");
+
+    const filteredRecipes = recipes.filter((recipe) =>
+      (selectedCategory === "All" || recipe.category === selectedCategory) &&
+      recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  
+
+    
+    return (
+      <SafeAreaView>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View>
+            <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
+          </View>
+
+          <View>
+            <TextInput
+            style={styles.searchBar}
+            placeholder="Search recipes..."
+            placeholderTextColor="#9A9D96"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            />
+          </View>
+
+          <ScrollView horizontal /*scrollar i sidled*/ showsHorizontalScrollIndicator={false} /*visar ej att det går att scrolla med en scrollbar*/> 
+            <View style={styles.buttonGap}>
+              {categories.map((category) => (
+                <TouchableOpacity
+                  key={category}  /*knappens namn*/
+                  activeOpacity = {0.2} /*annorlunda för mindre knappar - tydlig blinkning*/
+                  onPress={() => {  /*onPress säger vad som ska väljas*/
+                    setSelectedCategory(category)
+                    if (category === "All") {
+                      setSearchQuery("");
+                    }
+                  }}
+                >
+                  <Text style={styles.categoryButton}>{category}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+
+          <ScrollView>
+            <Text style={styles.recommended}>Recommended recipes</Text>
+            {/*
+            <TouchableOpacity onPress={() => setSelectedCategory("All")}>
+              <Text>See all</Text>
+            </TouchableOpacity>
+            */}
+          </ScrollView>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <RecipeMenu items={filteredRecipes}/>
+          </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: "#F8F8F5",
+    },
+    grid: {
+      padding: 10,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 15,
+    },
+    recipeCard: {
+      width: 210,
+      height: 100,
+      borderRadius: 18,
+      backgroundColor: "#FFFFFF",
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: "#ECEDE8",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+    },
+    recipeCardPressed: {
+      opacity: 0.75,
+    },
+    recipeInfo: {
+      padding: 13,
+    },
+    recipeTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: "#252824",
+      lineHeight: 21,
+    },
+    recipeTime: {
+      fontSize: 13,
+      color: "#3a3f39",
+    },
+    recipeCals: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: "#3a3f39",
+    },
+    title: {
+      paddingHorizontal: 6,
+      fontSize: 24,
+      fontWeight: "900",
+      color: "#252824",
+    },
+    recommended: {
+      paddingHorizontal: 6,
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#252824",
+    },
+    categoryButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 30,
+      backgroundColor: "#FFFFFF",
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: "#ECEDE8",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+    },
+    buttonGap: {
+      padding: 6,
+      gap: 6,
+      flexDirection: "row",
+    },
+    searchBar: {
+      marginHorizontal: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 10,
+      borderRadius: 30,
+      backgroundColor: "#FFFFFF",
+      borderWidth: 1,
+      borderColor: "#ECEDE8",
+      fontSize: 15,
+      color: "#252824",
+    }
+  });
