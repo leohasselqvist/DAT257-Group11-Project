@@ -6,6 +6,7 @@ import {
   TouchableOpacity,         /*osynlig knapp som tonar*/
   View,                      /*grupperar, strukturerar och stylar andra komponenter*/
   StyleSheet,
+  Image,
 } from "react-native";
 import { recipes } from "../../data/recipes";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,6 +38,15 @@ export default function HomeScreen() {                                      /*re
   
   return (
     <SafeAreaView>
+      <Image
+        source={require('../../../assets/images/Goodfood_logo_v1.png')}
+        style={{
+          width: 200,
+          height: 80,
+          marginVertical: 16,
+        }}
+        resizeMode="contain"
+        />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
