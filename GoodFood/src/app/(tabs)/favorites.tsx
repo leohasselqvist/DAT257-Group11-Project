@@ -1,7 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, View, Text, StyleSheet } from "react-native";
 import { FavoritesContext } from "../../contexts/FavoritesContext";
 import { recipes } from "../../data/recipes";
+import { RecipeCard } from "../../components/RecipeCard";
 
 export default function Favorites() {
     const favorites = React.useContext(FavoritesContext);
@@ -12,19 +13,13 @@ export default function Favorites() {
     const favoriteRecipes = recipes.filter((recipe) => likedIds.includes(recipe.id));
 
     return (
-        <View style={styles.container}>
-            {favoriteRecipes.map(recipe => (
-                <View key={recipe.id}>
-                    <Text>{recipe.title}</Text>
-                    <Text>{recipe.category}</Text>
-                    <Text>{recipe.time}</Text>
-                    
-                    <TouchableOpacity onPress={() => setLikedIds(likedIds.filter((id) => id !== recipe.id))}>
-                        <Text style={{ fontSize: 28, color: "red" }}>♡</Text>
-                    </TouchableOpacity>
-                </View>
+        <ScrollView>
+        <View style={styles.grid}>
+            {favoriteRecipes.map((r) => (
+            <RecipeCard key={r.id} recipe={r} />
             ))}
         </View>
+        </ScrollView>
     );
 }
 
@@ -33,5 +28,11 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
+    },
+    grid: {
+        padding: 10,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 15,
     },
 });
