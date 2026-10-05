@@ -6,7 +6,7 @@ export default function TabLayout() {
     /*Ger alla flikar som ligger innanför favoritstates*/
     <FavoritesProvider> 
   
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
       <Tabs.Screen
         name="homemenu"
         options={{
