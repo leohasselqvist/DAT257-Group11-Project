@@ -6,9 +6,9 @@ export default function TabLayout() {
     /*Ger alla flikar som ligger innanför favoritstates*/
     <FavoritesProvider> 
   
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
       <Tabs.Screen
-        name="index"
+        name="homemenu"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
@@ -18,21 +18,14 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
         }}
-      />
-      <Tabs.Screen
-      name="recipes"
-      options={{
-        title: 'Recipes',
-        tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
-      }}
       />
       <Tabs.Screen
       name="favorites"
       options={{
         title: 'Favorites',
-        tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+        tabBarIcon: ({ color }) => <FontAwesome size={28} name="heart" color={color} />,
       }}
       />
     </Tabs>
