@@ -40,7 +40,7 @@
         } else {
           setLikedIds([...likedIds, id]); /*Toggle on hjärta*/
             }}}>
-            <Text style={{ fontSize: 28, color: likedIds.includes(id) ? "red" : "gray" }}>♡</Text>
+            <Text style={[styles.likeButton, { color: likedIds.includes(id) ? "red" : "gray" }]}>♡</Text>
         </TouchableOpacity>
         </View>
       </Pressable>
@@ -145,7 +145,7 @@
     },
     recipeCard: {
       width: 210,
-      height: 100,
+      height: 130,
       borderRadius: 18,
       backgroundColor: "#FFFFFF",
       overflow: "hidden",
@@ -217,5 +217,9 @@
       borderColor: "#ECEDE8",
       fontSize: 15,
       color: "#252824",
+    },
+    likeButton: {
+      fontSize: 28,
+
     }
   });
