@@ -1,13 +1,20 @@
 import React, {useState} from "react";
 import { Text, View, StyleSheet, TextInput, Pressable } from "react-native";
+import * as api from '../../backend/api';
+import { useRouter } from 'expo-router';
 
 export default function Login() {
+    const router = useRouter();
     const [username, setUsername] = useState("");
-    function handlePress(){
+    async function handlePress(){
         if (username.trim() === ""){
             console.log("invalid input");
         }else {
-            console.log("valid input");
+            const id = await api.addUser(username);
+            console.log("user id", id);
+            if (id !== -1) {
+            router.replace('/home');
+            }
         }
     }
     return (

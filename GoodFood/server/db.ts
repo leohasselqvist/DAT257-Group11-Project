@@ -1,12 +1,13 @@
-const Database = require('better-sqlite3')('foobar.db', Option);
+import Database from 'better-sqlite3';
 import {readFileSync} from 'node:fs';
+import test from 'node:test';
 
 
 // Creates a new db if not exits
 const db = new Database('goodfood.db');
 
 
-function createTables():void{
+export function createTables():void{
     db.exec(readFileSync(new URL('./schema.sql', import.meta.url), 'utf8'));            
 }
 //adds a new user to the database and returns status 
@@ -22,6 +23,7 @@ export function addUser(user :{username: string;}): number{
     catch(err: any){
         //if the user already exists
         //find its id and return it
+        console.log('insert failed:', err.message);
         return Number(getUser((user)));
 
     }
@@ -39,6 +41,6 @@ export function getUser(user:{username:string}): number{
         return -1;
     }
 }
-export function removeUser()void;
+
 
 
