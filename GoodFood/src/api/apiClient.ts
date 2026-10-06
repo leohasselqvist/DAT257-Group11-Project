@@ -26,6 +26,7 @@ export async function FetchRecipeAPI<T>(endpoint: string, query?: URLSearchParam
   const baseURL = "https://recipeapi.io/";
   const url = new URL(endpoint, baseURL);
   if (query) url.search = query.toString();
+    console.log("query: ", query);
 
   const response = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${recipeApiKey}` },
@@ -35,5 +36,5 @@ export async function FetchRecipeAPI<T>(endpoint: string, query?: URLSearchParam
     throw new Error(`[RecipeAPI] Request failed: ${response.status} ${response.statusText}`);
   }
 
-  return response.json() as Promise<T>;
+  return response.json();
 }
