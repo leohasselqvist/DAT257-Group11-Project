@@ -1,26 +1,34 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { FetchDietly } from "../api/apiClient";
+import { getRecipes } from "../../api/recipeApi";
 
 export default function ApiTesting() {
   useEffect(() => {
-    async function testPopular() {
+    async function testRecipes() {
       try {
-        const foods = await FetchDietly<unknown>(
-          "foods/popular?limit=10&offset=0"
-        );
-        console.log("GET /popular:/foods", JSON.stringify(foods, null, 2));
+        const response = await getRecipes(1, 10);
+
+     
+        console.log("Number of recipes:", response.data.length);
+        console.log("First recipe name:", response.data[0]?.name);
+
+        for (const ingredient of response.data[0]?.ingredients || []) {
+          console.log("Ingredient:", ingredient.name, "Quantity:", ingredient.quantity, "Unit:", ingredient.unit);
+        }
+        // console.log("First recipe ingredients:", response.data[0]?.ingredients);
+        // console.log("First recipe:", response.data[0]);
+        
       } catch (error) {
-        console.error("Popular foods request failed:", error);
-      }
+        console.error("Recipes request failed:", error);
+      } 
     }
 
-    void testPopular();
+    void testRecipes();
   }, []);
 
   return (
     <View>
-      <Text>Check the Expo/Metro console for the popular foods response.</Text>
+      <Text>Check the Expo/Metro console for the recipes response.</Text>
     </View>
   );
 }
