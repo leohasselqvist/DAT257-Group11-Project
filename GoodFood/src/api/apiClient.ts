@@ -1,5 +1,4 @@
-import { Header } from "expo-router/build/react-navigation";
-import { dietlyApiKey, recipeApiKey } from "./secret" // IF YOU GET AN ERROR HERE DM LEO
+import { dietlyApiKey, recipeApiKey } from "./secret"; // IF YOU GET AN ERROR HERE DM LEO
 
 // Api Client
 

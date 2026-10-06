@@ -43,3 +43,5 @@ example
 /android
 
 .metals/
+
+secret.ts
