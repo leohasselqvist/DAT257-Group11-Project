@@ -1,5 +1,5 @@
 import { Header } from "expo-router/build/react-navigation";
-import { dietlyApiKey } from "./secret" // IF YOU GET AN ERROR HERE DM LEO
+import { dietlyApiKey, recipeApiKey } from "./secret" // IF YOU GET AN ERROR HERE DM LEO
 
 // Api Client
 
@@ -21,4 +21,20 @@ export async function FetchDietly<T>(endpoint: string, params?: RequestInit) {
   }
 
   return r.json();
+}
+
+export async function FetchRecipeAPI<T>(endpoint: string, query?: URLSearchParams) {
+  const baseURL = "https://recipeapi.io/";
+  const url = new URL(endpoint, baseURL);
+  if (query) url.search = query.toString();
+
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${recipeApiKey}` },
+  });
+
+  if (!response.ok) {
+    throw new Error(`[RecipeAPI] Request failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json() as Promise<T>;
 }
