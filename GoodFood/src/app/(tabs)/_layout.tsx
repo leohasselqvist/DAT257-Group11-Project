@@ -1,10 +1,14 @@
-import { Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs } from 'expo-router';
+import { FavoritesProvider } from '../../contexts/FavoritesContext';
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
+    /*Ger alla flikar som ligger innanför favoritstates*/
+    <FavoritesProvider> 
+  
+    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
       <Tabs.Screen
-        name="home"
+        name="homemenu"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
@@ -14,23 +18,17 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
         }}
-      />
-      <Tabs.Screen
-      name="recipes"
-      options={{
-        title: 'Recipes',
-        tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
-      }}
       />
       <Tabs.Screen
       name="favorites"
       options={{
         title: 'Favorites',
-        tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+        tabBarIcon: ({ color }) => <FontAwesome size={28} name="heart" color={color} />,
       }}
       />
     </Tabs>
+    </FavoritesProvider>
   );
 }

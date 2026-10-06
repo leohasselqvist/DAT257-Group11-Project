@@ -13,7 +13,7 @@ export default function Login() {
             const id = await api.addUser(username);
             console.log("user id", id);
             if (id !== -1) {
-            router.replace('/home');
+            router.replace('/homemenu');
             }
         }
     }

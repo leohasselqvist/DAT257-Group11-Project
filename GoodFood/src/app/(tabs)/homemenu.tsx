@@ -1,115 +1,97 @@
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
-	/*SafeAreaView,             /*inte krockar med hårdvara och mjukvara*/
-                            /*Borde vi ha en SafeAreaProvider? */
-	ScrollView,               /*möjliggör scroll*/
-	Text,                     /*visa och styla text*/
-	TextInput,                /*inmatning*/
-	TouchableOpacity,         /*osynlig knapp som tonar*/
-	View                      /*grupperar, strukturerar och stylar andra komponenter*/
+  ScrollView,               /*möjliggör scroll*/
+  Text,                     /*visa och styla text*/
+  TextInput,                /*inmatning*/
+  TouchableOpacity,         /*osynlig knapp som tonar*/
+  View,                      /*grupperar, strukturerar och stylar andra komponenter*/
+  StyleSheet,
+  Image,
 } from "react-native";
+import { recipes } from "../../data/recipes";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { RecipeCard } from "../../components/RecipeCard";
+
 
 const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
 
-const recipes = [
-  {
-    id: 1,
-    title: "Creamy Garlic Chicken",
-    category: "Lunch & Dinner",
-    calories: 520,          /*skrivs över med beräkning nedan om felaktigt*/
-    protein: 35,
-    carbs: 20,
-    fat: 30,
-    time: "30 min",
-  },
-  {
-    id: 2,
-    title: "Avocado Egg Toast",
-    category: "Breakfast",
-    calories: 340,
-    protein: 15,
-    carbs: 25,
-    fat: 10,
-    time: "10 min",
-  },
-  {
-    id: 3,
-    title: "Mediterranean Bowl",
-    category: "Lunch & Dinner",
-    calories: 430,
-    protein: 20,
-    carbs: 50,
-    fat: 15,
-    time: "20 min",
-  },
-
-
-];
+function RecipeMenu({ items }: { items : typeof recipes }) {
+  return (
+    <View style={styles.grid}>
+      {items.map((item) => (
+        <RecipeCard key={item.id} recipe={item} />
+      ))}
+    </View>
+  );
+}
 
 export default function HomeScreen() {                                      /*returnerar det som ska synas*/
-  const [selectedCategory, setSelectedCategory] = React.useState("All");    /*vald knapp*/ /*utlösare, ändra det som syns*/ /*skapa nytt minne, default är "All"*/
+  const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const [searchQuery, setSearchQuery] = React.useState("");
 
-  const filteredRecipes =                                                   /*filtreringsmöjlighet*/
-    selectedCategory === "All"                                              /*== jämför värden, === jämför värden och datatyp*/
-      ? recipes                                                             /* om sant */
-      : recipes.filter((recipe) => recipe.category === selectedCategory );  /* gör detta */ /* gå igenom listan */ /*enskilt recept*/ /*om receptets kategori är sant*/
+  const filteredRecipes = recipes.filter((recipe) =>
+    (selectedCategory === "All" || recipe.category === selectedCategory) &&
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
+
+  
   return (
-    <SafeAreaView> 
+    <SafeAreaView>
+      <Image
+        source={require('../../../assets/images/Goodfood_logo_v1.png')}
+        style={{
+          width: 200,
+          height: 80,
+          marginVertical: 16,
+        }}
+        resizeMode="contain"
+        />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
-          <Text>Welcome, what recipes are you interested in?</Text>
+          <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
         </View>
 
         <View>
-          <TextInput placeholder="Search recipes, ingredients..." />
+          <TextInput
+          style={styles.searchBar}
+          placeholder="Search recipes..."
+          placeholderTextColor="#9A9D96"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          />
         </View>
 
         <ScrollView horizontal /*scrollar i sidled*/ showsHorizontalScrollIndicator={false} /*visar ej att det går att scrolla med en scrollbar*/> 
-          {categories.map((category) => (
-            <TouchableOpacity 
-              key={category}                                                                /*knappens namn*/
-              activeOpacity = {0.2}                                                         /*annorlunda för mindre knappar - tydlig blinkning*/
-              onPress={() => setSelectedCategory(category)}                                 /*onPress säger vad som ska väljas*/
-            >
-              <Text>{category}</Text>
-            </TouchableOpacity>
-          ))}
+          <View style={styles.buttonGap}>
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}  /*knappens namn*/
+                activeOpacity = {0.2} /*annorlunda för mindre knappar - tydlig blinkning*/
+                onPress={() => {  /*onPress säger vad som ska väljas*/
+                  setSelectedCategory(category)
+                  if (category === "All") {
+                    setSearchQuery("");
+                  }
+                }}
+              >
+                <Text style={styles.categoryButton}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
 
-        <View>
-          <Text>Recommended recipes</Text>
-
+        <ScrollView>
+          <Text style={styles.recommended}>Recommended recipes</Text>
+          {/*
           <TouchableOpacity onPress={() => setSelectedCategory("All")}>
             <Text>See all</Text>
           </TouchableOpacity>
-        </View>
+          */}
+        </ScrollView>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {filteredRecipes.map((recipe) => (
-            <TouchableOpacity 
-              key={recipe.id}                                               /*knappens namn*/
-              activeOpacity={0.85}                                          /*default värde på opacity enligt standard på hemsida, jobbigt om stor knapp lyser mycket*/> 
-              <View>
-                <Text>{recipe.category}</Text>
-
-                <Text numberOfLines={2}>{recipe.title}</Text>
-
-                <Text>
-                  {recipe.time} {"\n"}
-
-                  {recipe.protein && recipe.carbs && recipe.fat
-                    ? (recipe.protein * 4) + (recipe.carbs * 4) + (recipe.fat * 9) /*om detta är sant gör följande*/
-                    : recipe.calories} kcal {"\n"}                                 {/*annars gör detta*/ /*ny rad*/}
-
-                  {recipe.protein && `${recipe.protein}g protein`         /*om receptet har protein*/ /*om sant går vidare*/ /*skriv ut texten*/}
-                  {recipe.carbs && ` | ${recipe.carbs}g carbs`}
-                  {recipe.fat && ` | ${recipe.fat}g fat`}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <RecipeMenu items={filteredRecipes}/>
         </ScrollView>
       </ScrollView>
     </SafeAreaView>
@@ -117,3 +99,56 @@ export default function HomeScreen() {                                      /*re
 }
 
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F8F8F5",
+  },
+  grid: {
+    padding: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 15,
+  },
+  title: {
+    paddingHorizontal: 6,
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#252824",
+  },
+  recommended: {
+    paddingHorizontal: 6,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#252824",
+  },
+  categoryButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#ECEDE8",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+  },
+  buttonGap: {
+    padding: 6,
+    gap: 6,
+    flexDirection: "row",
+  },
+  searchBar: {
+    marginHorizontal: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#ECEDE8",
+    fontSize: 15,
+    color: "#252824",
+  },
+});
