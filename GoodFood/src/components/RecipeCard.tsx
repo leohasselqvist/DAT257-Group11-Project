@@ -1,11 +1,18 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FavoritesContext } from "../contexts/FavoritesContext";
 import { recipes } from "../data/recipes";
 
 type Recipe = (typeof recipes)[number];
 
-export function RecipeCard({ recipe }: { recipe: Recipe }) {
+export function RecipeCard({ 
+    recipe, 
+    showAddButton = false,
+     onAdd, 
+}: { 
+    recipe: Recipe, 
+    showAddButton?: boolean, 
+    onAdd?: (recipeId: number) => void }) {
     const context = useContext(FavoritesContext);
     if (!context) return null;
     const { likedIds, setLikedIds } = context;
@@ -30,6 +37,14 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
             >
                 <Text style={[styles.likeButton, { color: liked ? "red" : "gray" }]}>♡</Text>
             </TouchableOpacity>
+            {showAddButton && (
+                <TouchableOpacity
+                    style={styles.addButtonPosition}
+                    onPress={() => onAdd?.(recipe.id)}
+                    >
+                        <Text style={styles.likeButton}>+</Text>
+                    </TouchableOpacity>
+            )}
         </Pressable>
     );
 }
@@ -76,5 +91,10 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
             position: "absolute",
             right: 10,
             bottom: 8,
+        },
+        addButtonPosition: {
+            position: "absolute",
+            right: 50,
+            bottom: 10,
         }
     });
