@@ -11,11 +11,67 @@ import {
 import { recipes } from "../../data/recipes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RecipeCard } from "../../components/RecipeCard";
+import { getRecipes } from "../../api/recipeApi";
+import { MealType } from "../../api/types";
 
+type CategoryKey = "All" | "Breakfast" | "Lunch & Dinner" | "Light meal" | "Snack";
 
-const categories = ["All", "Breakfast", "Lunch & Dinner", "Light meal", "Snack"];
+const categoryButtons: Array<{ label: CategoryKey; apiValue?: MealType }> = [
+  { label: "All" },
+  { label: "Breakfast", apiValue: MealType.breakfast },
+  { label: "Lunch & Dinner", apiValue: MealType.main },
+  { label: "Light meal", apiValue: MealType.snack },
+  { label: "Snack", apiValue: MealType.snack },
+];
 
-function RecipeMenu({ items }: { items : typeof recipes }) {
+type RecipeUI = {
+  id: number;
+  title: string;
+  category: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  time: string;
+  ingredients?: Array<{
+    name: string;
+    quantity?: number | string;
+    unit?: string;
+  }>;
+  instructions?: string[];
+};
+
+function mapApiRecipeToCard(apiRecipe: any): RecipeUI {
+  const rawMealType = apiRecipe.meal_type;
+
+  let category: CategoryKey = "Lunch & Dinner";
+  if (rawMealType === MealType.breakfast) category = "Breakfast";
+  else if (rawMealType === MealType.snack) category = "Snack";
+  else if (rawMealType === MealType.main) category = "Lunch & Dinner";
+
+  return {
+    id: apiRecipe.id,
+    title: apiRecipe.name ?? "Unnamed recipe",
+    category,
+    calories: apiRecipe.calories_per_serving ?? 0,
+    protein: apiRecipe.protein ?? 0,
+    carbs: apiRecipe.carbs ?? 0,
+    fat: apiRecipe.fat ?? 0,
+    time: `${(apiRecipe.prep_time ?? 0) + (apiRecipe.cook_time ?? 0)} min`,
+    ingredients: Array.isArray(apiRecipe.ingredients)
+      ? apiRecipe.ingredients.map((ingredient: any) => ({
+          name: ingredient.name ?? "Ingredient",
+          quantity: ingredient.quantity ?? "",
+          unit: ingredient.unit ?? "",
+        }))
+      : [],
+    instructions: Array.isArray(apiRecipe.instructions)
+      ? apiRecipe.instructions
+      : [],
+  };
+}
+
+function RecipeMenu({ items }: { items: RecipeUI[] }) {
   return (
     <View style={styles.grid}>
       {items.map((item) => (
@@ -25,17 +81,40 @@ function RecipeMenu({ items }: { items : typeof recipes }) {
   );
 }
 
-export default function HomeScreen() {                                      /*returnerar det som ska synas*/
-  const [selectedCategory, setSelectedCategory] = React.useState("All");
+export default function HomeScreen() {
+  const [selectedCategory, setSelectedCategory] = React.useState<CategoryKey>("All");
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [recipes, setRecipes] = React.useState<RecipeUI[]>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  async function fetchRecipes(category: CategoryKey = selectedCategory) {
+    try {
+      setLoading(true);
+
+      const response = await getRecipes({
+        per_page: 10,
+        page: 1,
+      });
+
+      const mapped = (response.data ?? []).map(mapApiRecipeToCard);
+      setRecipes(mapped);
+    } catch (error) {
+      console.error("Failed to load recipes:", error);
+      setRecipes([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  React.useEffect(() => {
+    void fetchRecipes("All");
+  }, []);
 
   const filteredRecipes = recipes.filter((recipe) =>
     (selectedCategory === "All" || recipe.category === selectedCategory) &&
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+    recipe.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
   );
 
-
-  
   return (
     <SafeAreaView>
       <Image
@@ -46,7 +125,8 @@ export default function HomeScreen() {                                      /*re
           marginVertical: 16,
         }}
         resizeMode="contain"
-        />
+      />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
@@ -54,28 +134,33 @@ export default function HomeScreen() {                                      /*re
 
         <View>
           <TextInput
-          style={styles.searchBar}
-          placeholder="Search recipes..."
-          placeholderTextColor="#9A9D96"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
+            style={styles.searchBar}
+            placeholder="Search recipes..."
+            placeholderTextColor="#9A9D96"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
         </View>
 
-        <ScrollView horizontal /*scrollar i sidled*/ showsHorizontalScrollIndicator={false} /*visar ej att det går att scrolla med en scrollbar*/> 
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.buttonGap}>
-            {categories.map((category) => (
+            {categoryButtons.map((category) => (
               <TouchableOpacity
-                key={category}  /*knappens namn*/
-                activeOpacity = {0.2} /*annorlunda för mindre knappar - tydlig blinkning*/
-                onPress={() => {  /*onPress säger vad som ska väljas*/
-                  setSelectedCategory(category)
-                  if (category === "All") {
-                    setSearchQuery("");
-                  }
+                key={category.label}
+                activeOpacity={0.2}
+                onPress={() => {
+                  setSelectedCategory(category.label);
+                  void fetchRecipes(category.label);
                 }}
               >
-                <Text style={styles.categoryButton}>{category}</Text>
+                <Text
+                  style={[
+                    styles.categoryButton,
+                    selectedCategory === category.label && styles.categoryButtonSelected,
+                  ]}
+                >
+                  {category.label}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -83,16 +168,15 @@ export default function HomeScreen() {                                      /*re
 
         <ScrollView>
           <Text style={styles.recommended}>Recommended recipes</Text>
-          {/*
-          <TouchableOpacity onPress={() => setSelectedCategory("All")}>
-            <Text>See all</Text>
-          </TouchableOpacity>
-          */}
         </ScrollView>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <RecipeMenu items={filteredRecipes}/>
-        </ScrollView>
+        {loading ? (
+          <Text style={{ margin: 12 }}>Loading recipes...</Text>
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <RecipeMenu items={filteredRecipes} />
+          </ScrollView>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -141,8 +225,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   searchBar: {
-    marginHorizontal: 6,
-    paddingHorizontal: 10,
+    flex: 1,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 30,
     backgroundColor: "#FFFFFF",
@@ -150,5 +234,9 @@ const styles = StyleSheet.create({
     borderColor: "#ECEDE8",
     fontSize: 15,
     color: "#252824",
+  },
+  categoryButtonSelected: {
+    backgroundColor: "#E8F2FF",
+    borderColor: "#8DB9FF",
   },
 });
