@@ -84,30 +84,40 @@ function RecipeMenu({ items }: { items: RecipeUI[] }) {
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = React.useState<CategoryKey>("All");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [recipes, setRecipes] = React.useState<RecipeUI[]>([]);
+  const [recipes, setRecipes] = React.useState<any[]>([]);
+  const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
 
-  async function fetchRecipes(category: CategoryKey = selectedCategory) {
-    try {
-      setLoading(true);
+  async function fetchRecipes(category: CategoryKey = selectedCategory, nextPage: number = page) {
+  try {
+    setLoading(true);
 
-      const response = await getRecipes({
-        per_page: 10,
-        page: 1,
-      });
+    const response = await getRecipes({
+      per_page: 10,
+      page: nextPage,
+    });
 
-      const mapped = (response.data ?? []).map(mapApiRecipeToCard);
-      setRecipes(mapped);
-    } catch (error) {
-      console.error("Failed to load recipes:", error);
-      setRecipes([]);
-    } finally {
-      setLoading(false);
-    }
+    const mapped = (response.data ?? []).map(mapApiRecipeToCard);
+
+    setRecipes((prev) => {
+      const seen = new Set(prev.map((r) => r.id));
+      return [...prev, ...mapped.filter((r) => !seen.has(r.id))];
+    });
+    setPage(nextPage + 1);
+  } catch (error) {
+    console.error("Failed to load recipes:", error);
+    // no setRecipes([]) here, so a failed "Show more" keeps the list
+  } finally {
+    setLoading(false);
   }
+}
+
+  const hasFetched = React.useRef(false);
 
   React.useEffect(() => {
-    void fetchRecipes("All");
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    void fetchRecipes("All", 1);
   }, []);
 
   const filteredRecipes = recipes.filter((recipe) =>
@@ -116,7 +126,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <Image
         source={require('../../../assets/images/Goodfood_logo_v1.png')}
         style={{
@@ -150,7 +160,6 @@ export default function HomeScreen() {
                 activeOpacity={0.2}
                 onPress={() => {
                   setSelectedCategory(category.label);
-                  void fetchRecipes(category.label);
                 }}
               >
                 <Text
@@ -166,17 +175,20 @@ export default function HomeScreen() {
           </View>
         </ScrollView>
 
-        <ScrollView>
+        <View>
           <Text style={styles.recommended}>Recommended recipes</Text>
-        </ScrollView>
+        </View>
 
         {loading ? (
           <Text style={{ margin: 12 }}>Loading recipes...</Text>
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <View>
             <RecipeMenu items={filteredRecipes} />
-          </ScrollView>
+          </View>
         )}
+        <TouchableOpacity style={{alignSelf: "center"}} onPress={() => void fetchRecipes("All", page)}>
+          <Text style={styles.showMoreButton}>{loading ? "Loading..." : "Show more"}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -238,5 +250,19 @@ const styles = StyleSheet.create({
   categoryButtonSelected: {
     backgroundColor: "#E8F2FF",
     borderColor: "#8DB9FF",
+  },
+  showMoreButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#ECEDE8",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+
   },
 });
