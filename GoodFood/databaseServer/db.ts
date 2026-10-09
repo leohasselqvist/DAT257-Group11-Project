@@ -1,7 +1,5 @@
 import Database from 'better-sqlite3';
 import {readFileSync} from 'node:fs';
-import test from 'node:test';
-
 
 // Creates a new db if not exits
 const db = new Database('goodfood.db');

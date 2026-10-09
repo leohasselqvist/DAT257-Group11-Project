@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, TextInput, Pressable } from "react-native";
-import * as api from '../../backend/api';
+import * as api from '../databaseAPI/API';
 import { useRouter } from 'expo-router';
 
 export default function Signup() {

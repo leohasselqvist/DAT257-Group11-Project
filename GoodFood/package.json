@@ -42,7 +42,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "concurrently \"tsx server/index.ts\" \"expo start --web\"",
+    "start": "concurrently \"tsx databaseServer/index.ts\" \"expo start --web\"",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
