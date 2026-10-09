@@ -42,3 +42,4 @@ example
 /ios
 /android
 goodfood.db
+src/api/secret.ts 
