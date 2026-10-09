@@ -22,6 +22,7 @@ export function addUser(user :{username: string;}): number{
         //if the user already exists
         //find its id and return it
         console.log('insert failed:', err.message);
+        return -1;
     }
 } 
 
