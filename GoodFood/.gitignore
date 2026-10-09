@@ -43,3 +43,6 @@ example
 /android
 goodfood.db
 src/api/secret.ts 
+
+.metals/
+secret.ts
