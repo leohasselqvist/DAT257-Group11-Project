@@ -3,34 +3,38 @@ import { Text, View, StyleSheet, TextInput, Pressable } from "react-native";
 import * as api from '../../backend/api';
 import { useRouter } from 'expo-router';
 
-export default function Login() {
+export default function Signup() {
     const router = useRouter();
     const [username, setUsername] = useState("");
     const [error, setError] = useState("");
 
-    async function handlePress() {
-        if (username.trim() === "") {
+    async function handleSignup() {
+        const name = username.trim();
+        if (name === "") {
             setError("Please enter a valid username");
             return;
         }
         try {
-            const id = await api.getUserId(username.trim());
-            if (id !== -1) {
-                // TODO: store id for the favourites calls
-                router.replace('/homemenu');
-            } else {
-                setError("User does not exist click signup to make an account");
+            const existing = await api.getUserId(name);
+            if (existing !== -1) {
+                setError("Username already taken");
+                return;
             }
+            const id = await api.addUser(name);
+            if (id === -1) {
+                setError("Could not create account, try again");
+                return;
+            }
+            router.replace('/'); // back to the login page
         } catch {
             setError("Can't reach the server");
         }
     }
-
     return (
         <View style={styles.container}>
             <View>
                 <View style={styles.form}>
-                    <Text style={styles.header}>Sign in to GoodFood</Text>
+                    <Text style={styles.header}>Create your account</Text>
                     <View style={styles.row}>
                         <View>
                             <TextInput
@@ -50,14 +54,14 @@ export default function Login() {
                                 styles.button,
                                 pressed && styles.buttonPressed
                             ]}
-                            onPress={handlePress}
+                            onPress={handleSignup}
                         >
-                            <Text>Login</Text>
+                            <Text>Sign up</Text>
                         </Pressable>
                     </View>
                 </View>
-                <Pressable style={styles.linkWrapper} onPress={() => router.push('/signup')}>
-                    <Text>No account? <Text style={styles.link}>Sign up</Text></Text>
+                <Pressable style={styles.linkWrapper} onPress={() => router.replace('/')}>
+                    <Text>Already have an account? <Text style={styles.link}>Log in</Text></Text>
                 </Pressable>
             </View>
         </View>
