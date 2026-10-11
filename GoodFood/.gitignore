@@ -41,3 +41,8 @@ example
 # generated native folders
 /ios
 /android
+goodfood.db
+src/api/secret.ts 
+
+.metals/
+secret.ts
