@@ -9,14 +9,16 @@ import {
   View,
 } from "react-native";
 import { FavoritesContext } from "../contexts/FavoritesContext";
+import { RecipeContext } from "../contexts/RecipeContext";
 
 type Ingredient = {
+  id: number; 
   name: string;
   quantity?: number | string;
   unit?: string;
 };
 
-type Recipe = {
+export type Recipe = {
   id: number;
   title: string;
   category?: string;
@@ -38,12 +40,28 @@ export function RecipeCard({
     showAddButton?: boolean, 
     onAdd?: (recipeId: number) => void }) {
     const [modalVisible, setModalVisible] = useState(false);
-    const context = useContext(FavoritesContext);
-    if (!context) return null;
-    const { likedIds, setLikedIds } = context;
-    const liked = likedIds.includes(recipe.id);
+    const favoriteContext = useContext(FavoritesContext);
+    const recipeContext = useContext(RecipeContext);
+
+    if (!favoriteContext || !recipeContext) return null;
+    const { likedIds, setLikedIds } = favoriteContext;
+    const { saveRecipe } = recipeContext;
+
+    const isFavorite = likedIds.includes(recipe.id);
     const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
-     const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
+    const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
+
+    function toggleFavorite() {
+      if (isFavorite) {
+        setLikedIds((currentIds) => 
+          currentIds.filter((recipeId) => recipeId !== recipe.id));
+      } 
+      else {
+        saveRecipe(recipe);
+        setLikedIds((currentIds) => [...currentIds, recipe.id]);
+      }
+    }
+
   return (
     <>
       <Modal
@@ -115,11 +133,9 @@ export function RecipeCard({
 
             <TouchableOpacity
                 style={styles.likeButtonPosition}
-                onPress={() =>
-                setLikedIds(liked ? likedIds.filter((i) => i !== recipe.id) : [...likedIds, recipe.id])
-                }
+                onPress={toggleFavorite}
             >
-                <Text style={[styles.likeButton, { color: liked ? "red" : "gray" }]}>♡</Text>
+                <Text style={[styles.likeButton, { color: isFavorite ? "red" : "gray" }]}>♡</Text>
             </TouchableOpacity>
             {showAddButton && (
                 <TouchableOpacity
