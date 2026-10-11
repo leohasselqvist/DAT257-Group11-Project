@@ -1,4 +1,4 @@
-import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable } from 'react-native';
+import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -8,6 +8,8 @@ const TextInputExample = () => {
   const [email, setEmail] = useState('alice@example.com'); /*väljer email*/
   const [password, setPassword] = useState('password123'); /*väljer lösenord*/
   const [isEditing, setIsEditing] = useState(false); /*väljer om man vill redigera eller inte*/ 
+  const [message, setMessage] = useState(''); /*meddelande som visas när man sparar informationen*/
+  const [updatedAt, setUpdatedAt] = useState(''); /*visar när informationen senast uppdaterades*/
 
   return (
     <SafeAreaProvider>
@@ -22,7 +24,7 @@ const TextInputExample = () => {
                 fontWeight: 'bold', 
                 marginBottom: 10,
                 marginTop: 20,
-                color: '#e0d0b8e2',
+                color: '#f9f7f4e2',
 
               }}
             >
@@ -65,13 +67,32 @@ const TextInputExample = () => {
           </View>
 
           <Button
-            title ={isEditing ? 'Spara' : 'Ändra information'}
-            onPress={() => setIsEditing(!isEditing)}
-            color = '#e4a03a6a'
+              title = {isEditing ? 'SAVE' : 'CHANGE INFORMATION'}
+              onPress={() => {
+                if (isEditing) {
+                  setUpdatedAt(new Date().toLocaleString('sv-SE')); /*visar när informationen senast uppdaterades*/
+                  setMessage('Your information has been saved.');
+                  
+                  if (Platform.OS === 'web') {
+                    window.alert('Your information has been saved.');
+                  } else {
+                    Alert.alert('Your information has been saved.');
+                  }
+                } else {
+                  setMessage('You can now change your information.');
+                }
+                setIsEditing(!isEditing);
+              }}
+              color = '#e6aa72f6'
 
           />
 
-        </ScrollView>
+          <Text>{message}</Text>
+
+          {updatedAt !== '' && (
+            <Text> Your information was last updated: {updatedAt}</Text>
+          )}
+          </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -82,7 +103,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#e48c3af6',
+    backgroundColor: '#ea821af6',
   },
 
 input: {
@@ -91,7 +112,7 @@ input: {
   borderWidth: 1,
   padding: 10,
   borderRadius: 10, 
-  backgroundColor: '#e48c3af6',
+  backgroundColor: '#e6aa72f6',
   color: 'white',
   borderColor: 'white',
 }
