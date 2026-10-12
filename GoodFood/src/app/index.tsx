@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import * as api from '../databaseAPI/API';
+import * as usercontext from '../contexts/UserContext';
 
 export default function Login() {
     const router = useRouter();
@@ -16,7 +17,7 @@ export default function Login() {
         try {
             const id = await api.getUserId(username.trim());
             if (id !== -1) {
-                // TODO: store id for the favourites calls
+                usercontext.storeCurrentUserId(id);
                 router.replace('/homemenu');
             } else {
                 setError("User does not exist click signup to make an account");
