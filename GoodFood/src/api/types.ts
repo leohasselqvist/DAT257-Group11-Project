@@ -124,7 +124,7 @@ export enum Order {
 
 export interface RecipeFilters {
   search?: string;
-  serach_in?: string; 
+  // search_in?: string; 
 //   ingredients?: string;
   cuisine?: Cuisine;
   meal_type?: MealType;

@@ -1,8 +1,8 @@
 import React from "react";
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { RecipeCard } from "../../components/RecipeCard";
 import { FavoritesContext } from "../../contexts/FavoritesContext";
 import { recipes } from "../../data/recipes";
-import { RecipeCard } from "../../components/RecipeCard";
 
 export default function Favorites() {
     const favorites = React.useContext(FavoritesContext);
