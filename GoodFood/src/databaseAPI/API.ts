@@ -76,3 +76,14 @@ export async function updateUserProfile( userId: number, firstName?: string, las
     const data = await res.json();
     return data.success;
 }
+export async function getUserById(userId: number) {
+    const res = await fetch(
+        API_URL + '/user/profile?userId=' + userId
+    );
+
+    if (!res.ok) {
+        throw new Error("Could not retrieve user");
+    }
+
+    return await res.json();
+}

@@ -109,3 +109,11 @@ export function updateUserProfile(userId:number, firstName?:string, lastName?:st
     }
     return 1;
 }
+
+export function getUserById(userId: number) {
+    const stmt = db.prepare(
+        "SELECT id, username, first_name, last_name, email FROM users WHERE id = ?"
+    );
+
+    return stmt.get(userId);
+}

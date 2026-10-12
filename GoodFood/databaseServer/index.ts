@@ -70,3 +70,15 @@ app.post('/user/update', function(req, res) {
 
     res.json({ success: result > 0 });
 });
+
+app.get('/user/profile', function(req, res) {
+    const userId = Number(req.query.userId);
+    const user = db.getUserById(userId);
+
+    if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+    }
+
+    res.json(user);
+});
