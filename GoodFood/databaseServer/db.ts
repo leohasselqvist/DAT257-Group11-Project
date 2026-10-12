@@ -9,12 +9,14 @@ export function createTables():void{
     db.exec(readFileSync(new URL('./schema.sql', import.meta.url), 'utf8'));            
 }
 //adds a new user to the database and returns status 
-export function addUser(user :{username: string;}): number{
+export function addUser(user :{username: string; password_hash: string;}): number{
     //create a prepared statement 
-    const pstmt = db.prepare('INSERT INTO users (username) VALUES (?)');
+    const pstmt = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)'
+    );
+
     try { 
         //insert the username into the table
-        const r = pstmt.run(user.username);
+        const r = pstmt.run(user.username, user.password_hash);
         // return the id of the newly created user
         return Number(r.lastInsertRowid);
     }
