@@ -16,7 +16,7 @@ export function addUser(user :{username: string;}): number{
 
     try { 
         //insert the username into the table
-        const r = pstmt.run(user.username, user.password_hash);
+        const r = pstmt.run(user.username);
         // return the id of the newly created user
         return Number(r.lastInsertRowid);
     }
