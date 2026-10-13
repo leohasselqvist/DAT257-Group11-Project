@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users(
     first_name TEXT,
     last_name TEXT,
     email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
+    /*password_hash TEXT NOT NULL,*/
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT 
 );

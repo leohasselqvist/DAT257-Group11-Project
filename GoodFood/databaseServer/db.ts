@@ -9,7 +9,7 @@ export function createTables():void{
     db.exec(readFileSync(new URL('./schema.sql', import.meta.url), 'utf8'));            
 }
 //adds a new user to the database and returns status 
-export function addUser(user :{username: string; password_hash: string;}): number{
+export function addUser(user :{username: string;}): number{
     //create a prepared statement 
     const pstmt = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)'
     );

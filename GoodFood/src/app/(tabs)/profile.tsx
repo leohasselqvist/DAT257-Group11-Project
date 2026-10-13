@@ -102,16 +102,6 @@ const TextInputExample = () => {
             />
 
             <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor='grey'
-              value = {password}
-              onChangeText={setPassword}
-              editable={isEditing}
-              secureTextEntry={!isEditing}     /*gör det till punkter när man har sparat*/
-            />
-
-            <TextInput
               style = {styles.input}
               placeholder="Allergies, ..."
               placeholderTextColor='grey'
