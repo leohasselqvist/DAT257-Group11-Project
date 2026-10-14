@@ -1,6 +1,9 @@
 import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { useState } from 'react'; /*tillstånd*/
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import * as api from '../../databaseAPI/API';
+import { useRouter } from 'expo-router';
+
 
 /*kontrollera att användarinfon inte är tom*/
 function checkUserInfo(
@@ -31,6 +34,8 @@ const TextInputExample = () => {
   const [updatedAt, setUpdatedAt] = useState('');             /*visar när informationen senast uppdateradesn*/
   const [allergies, setAllergies] = useState('');   /*skapar state för allergier med en tom startsträng*/
   const [avatar, setAvatar] = useState('');                   /*skapar state för avatar-emojin med en standard-emoji*/
+  const router = useRouter();
+  const [username, setUsername] = useState(''); /*hårdkodad användarnamn för testning, kan ändras till dynamiskt värde senare*/
 
   return (
     <SafeAreaProvider>
@@ -54,7 +59,7 @@ const TextInputExample = () => {
 
             <Text style = {{fontSize: 40}}>{avatar}</Text>          
             {isEditing && (
-              <View style = {{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, width: 212,}}>
+              <View style = {{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, width: 280,}}>
                 {['🍎', '🍐', '🍊', '🍋', '🍌', '🍉',
                   '🍇', '🍓', '🫐', '🍒', '🥭', '🍍',
                   '🥝', '🥑', '🥕', '🥦', '🍏', '🍑',
@@ -93,6 +98,15 @@ const TextInputExample = () => {
 
             <TextInput
               style={styles.input}
+              placeholder="Username"
+              placeholderTextColor='grey'
+              value = {username}
+              onChangeText={setUsername}
+              editable={isEditing}
+            />
+
+            <TextInput
+              style={styles.input}
               placeholder="Email"
               placeholderTextColor='grey'
               value = {email}
@@ -109,6 +123,8 @@ const TextInputExample = () => {
               onChangeText={setAllergies}
               editable={isEditing}
             />
+
+
 
           </View>
           
@@ -156,6 +172,34 @@ const TextInputExample = () => {
               }}
               color = "#f48208"                                       /*knappens färg*/
 
+          />
+
+          <Button
+              title = {'LOG OUT'} /*text på knappen*/
+              onPress={async () => {
+                try {
+                    await api.logoutUser(username); /*anropar API-funktionen för att logga ut användaren*/
+                } catch { //servern nåddes inte, men vi loggar ut ändå
+                  console.error('Logout failed: server unreachable'); /*loggar ett felmeddelande i konsolen*/
+                  if (Platform.OS === 'web') {
+                    window.alert('Logged out locally, but could not sync with the database.');
+                  } else {
+                    Alert.alert('Logged out locally, but could not sync with the database.');
+                    }
+                }
+
+                setFirstName(''); /*nollställer alla fält när man loggar ut*/
+                setLastName('');
+                setUsername('');
+                setEmail('');
+                setPassword('');
+                setAllergies('');
+                setAvatar('');
+                setMessage('You have been logged out.'); /*meddelande som visas när man loggar ut*/
+                setUpdatedAt(''); /*nollställer updatedAt när man loggar ut*/
+                setIsEditing(false); /*stänger redigeringsläge när man loggar ut*/
+                router.replace('/'); /*navigerar tillbaka till startsidan efter utloggning*/
+              }}  
           />
 
           <Text>{message}</Text>
