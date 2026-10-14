@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { FavoritesContext } from "../contexts/FavoritesContext";
 import { RecipeContext } from "../contexts/RecipeContext";
+import { getCurrentUserId } from "../contexts/UserContext";
+import { addFavouriteRecipe, removeFavouriteRecipe } from "../databaseAPI/API";
 
 type Ingredient = {
   id: number; 
@@ -51,17 +53,37 @@ export function RecipeCard({
     const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
     const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
 
-    function toggleFavorite() {
+    async function toggleFavorite() {
+      const userId = getCurrentUserId();
+      if (userId === null) {
+        return;
+      }
+
+      try {
       if (isFavorite) {
+        const result = await removeFavouriteRecipe(userId, recipe.id);
+        
+        if (result === -1){
+          throw new Error("Could not unfavorite");
+        }
+
         setLikedIds((currentIds) => 
           currentIds.filter((recipeId) => recipeId !== recipe.id));
       } 
+
       else {
+        const result = await addFavouriteRecipe(userId, recipe.id);
+        
+        if (result !== 1) {
+          throw new Error("Could not favorite");
+        }
         saveRecipe(recipe);
         setLikedIds((currentIds) => [...currentIds, recipe.id]);
       }
-    }
-
+    } catch (error) {
+    console.error("Favoritanropet misslyckades:", error);
+  }}
+    
   return (
     <>
       <Modal
