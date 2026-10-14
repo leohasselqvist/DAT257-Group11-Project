@@ -1,1 +1,0 @@
-export const dietlyApiKey = "1234";

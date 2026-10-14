@@ -1,64 +1,55 @@
-import { Text, View, StyleSheet } from "react-native";
-import { useState } from "react"
-import { Popular, Search } from "../../api/dietly"; // Step 1 Import the functions you want
+import { useEffect } from "react";
+import { Text, View } from "react-native";
+import { getRecipes } from "../../api/recipeApi";
+import { Difficulty,  DietaryTags, Sort, Order } from "../../api/types";
 
 export default function ApiTesting() {
-	/*interface foodProps {
-		id: number;
-		name: string;
-		brand: string;
-		barcode: string;
-		calories_kcal: number;
-		carbs_g: number;
-		fat: number;
-		protein_g: number;
-		suger_g: number;
-		image_url: string;
-	}
+  useEffect(() => {
+    async function testRecipes() {
+      try {
+        const response = await getRecipes({
+          search: "tomato",
+          difficulty: Difficulty.easy,
+          dietary_tags: DietaryTags.vegetarian,
+          sort: Sort.calories,
+          order: Order.desc,
+          page: 10,
+          per_page: 2
+        });
 
-	const [searchResult, setSearchResult] = useState<foodProps>();
-	const query: string = "clam";
-	const results: number = 1;
-	const search = async () => {
-		const url = new URL("https://api.getdietly.com/search");
-		url.search = new URLSearchParams({
-			q: query,
-			limit: results.toString(),
-		}).toString();
+        console.log(
+          "Filtered recipes:",
+          JSON.stringify(response, null, 2)
+        );
 
-		const r = await fetch(url, {
-			headers: { Authorization: `Bearer ${dietlyApiKey}` },
-		});
-		if (!r.ok) {
-			throw new Error(`[API] Dietly Error: ${r.status}`);
-		}
-		const result = await r.json();
-		return result;
-	};
+        console.log("Number of recipes:", response.data.length);
+        console.log("First recipe name:", response.data[0]?.name);
+        
+        // console.log("First recipe ingredients:", response.data[0]?.ingredients);
+        for (const ingredient of response.data[0]?.ingredients || []) {
+          console.log("Ingredient:", ingredient.name, "Quantity:", ingredient.quantity, "Unit:", ingredient.unit);
+        }
+        
+        // console.log("First recipe instructions:", response.data[0]?.instructions);
+        let i = 1;
+        for (const instruction of response.data[0]?.instructions || []) {
+          console.log(`Instruction ${i}:`, instruction);
+          i++;
+        }
+      
+        // console.log("First recipe:", response.data[0]);
+        
+      } catch (error) {
+        console.error("Recipes request failed:", error);
+      } 
+    }
 
-	useEffect(() => {
-		const s = search();
-		setSearchResult(s?.T);
-	}, []);
-	*/
+    void testRecipes();
+  }, []);
 
-	const { foods } = Popular(); // step 2, create a prop using the function
-
-	// Step 3, use conditionals to show the prop, eg. {PROP HERE ? (WHAT TO DO WHEN IT IS THERE)) : (WHAT TO DO WHEN IT IS LOADING OR FAILED)}
-
-	return (
-		<View>
-			<Text>
-				{foods ? (foods[0].name) : ("Something went wrong.")}
-			</Text>
-		</View>
-	);
+  return (
+    <View>
+      <Text>Check the Expo/Metro console for the recipes response.</Text>
+    </View>
+  );
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-});
