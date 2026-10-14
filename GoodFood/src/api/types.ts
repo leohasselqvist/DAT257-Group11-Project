@@ -11,7 +11,19 @@ export interface FoodProps {
 		image_url: string;
 	}
 
+export interface NutritionDataProps {
+	url: string;
+	calories: number;
+	totalWeight: number;
+	dietLabels: string[];
+	healthLabels: string[];
+	cautions: string[];
+	totalNutrients: {};
+	totalDaily: {};
+}
+
 export interface APIResponse<T> {
   data: T;
   status: string;
 }
+
