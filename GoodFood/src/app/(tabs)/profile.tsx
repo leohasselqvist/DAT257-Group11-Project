@@ -170,7 +170,7 @@ const TextInputExample = () => {
                 }                                                       /*växlar tillståndet för isEditing*/
                 setIsEditing(!isEditing);
               }}
-              color = "#f48208"                                       /*knappens färg*/
+              color = "#0857f4"                                       /*knappens färg*/
 
           />
 
