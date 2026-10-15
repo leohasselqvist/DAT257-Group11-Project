@@ -7,12 +7,19 @@ import {
   View,                      /*grupperar, strukturerar och stylar andra komponenter*/
   StyleSheet,
   Image,
+  Modal,
+  Pressable,
 } from "react-native";
-import { recipes } from "../../data/recipes";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RecipeCard } from "../../components/RecipeCard";
 import { getRecipes } from "../../api/recipeApi";
-import { MealType } from "../../api/types";
+import {
+  MealType,
+  Cuisine,
+  Difficulty,
+  DietaryTags,
+  RecipeFilters,
+} from "../../api/types";
 
 type CategoryKey = "All" | "Breakfast" | "Lunch & Dinner" | "Light meal" | "Snack";
 
@@ -81,6 +88,39 @@ function RecipeMenu({ items }: { items: RecipeUI[] }) {
   );
 }
 
+function FilterGroup<T extends string>({
+  title,
+  options,
+  selected,
+  onSelect,
+}: {
+  title: string;
+  options: T[];
+  selected?: T;
+  onSelect: (value: T | undefined) => void;
+}) {
+  return (
+    <View style={styles.filterGroup}>
+      <Text style={styles.filterGroupTitle}>{title}</Text>
+      <View style={styles.filterOptions}>
+        {options.map((option) => {
+          const active = selected === option;
+          return (
+            <TouchableOpacity
+              key={option}
+              onPress={() => onSelect(active ? undefined : option)}
+            >
+              <Text style={[styles.categoryButton, active && styles.categoryButtonSelected]}>
+                {option.replace(/_/g, " ")}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = React.useState<CategoryKey>("All");
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -88,37 +128,61 @@ export default function HomeScreen() {
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
 
-  async function fetchRecipes(category: CategoryKey = selectedCategory, nextPage: number = page) {
-  try {
-    setLoading(true);
+  const [filters, setFilters] = React.useState<RecipeFilters>({});   // applied filters
+  const [draft, setDraft] = React.useState<RecipeFilters>({});       // edited inside the popup
+  const [filterVisible, setFilterVisible] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(true);
 
-    const response = await getRecipes({
-      per_page: 10,
-      page: nextPage,
-    });
+  async function fetchRecipes(
+    nextPage: number = page,
+    activeFilters: RecipeFilters = filters,
+    reset: boolean = false
+  ) {
+    try {
+      setLoading(true);
 
-    const mapped = (response.data ?? []).map(mapApiRecipeToCard);
+      const response = await getRecipes({
+        ...activeFilters,
+        per_page: 10,
+        page: nextPage,
+      });
 
-    setRecipes((prev) => {
-      const seen = new Set(prev.map((r) => r.id));
-      return [...prev, ...mapped.filter((r) => !seen.has(r.id))];
-    });
-    setPage(nextPage + 1);
-  } catch (error) {
-    console.error("Failed to load recipes:", error);
-    // no setRecipes([]) here, so a failed "Show more" keeps the list
-  } finally {
-    setLoading(false);
+      const mapped = (response.data ?? []).map(mapApiRecipeToCard);
+
+      setRecipes((prev) => {
+        const base = reset ? [] : prev;
+        const seen = new Set(base.map((r) => r.id));
+        return [...base, ...mapped.filter((r) => !seen.has(r.id))];
+      });
+      setPage(nextPage + 1);
+      setHasMore(response.meta.current_page < response.meta.last_page);
+    } catch (error) {
+      console.error("Failed to load recipes:", error);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   const hasFetched = React.useRef(false);
 
   React.useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-    void fetchRecipes("All", 1);
+    void fetchRecipes(1, {}, true);
   }, []);
+
+  function openFilters() {
+    setDraft(filters);
+    setFilterVisible(true);
+  }
+
+  function applyFilters() {
+    setFilters(draft);
+    setFilterVisible(false);
+    void fetchRecipes(1, draft, true);
+  }
+
+  const activeFilterCount = Object.values(filters).filter((v) => v !== undefined).length;
 
   const filteredRecipes = recipes.filter((recipe) =>
     (selectedCategory === "All" || recipe.category === selectedCategory) &&
@@ -142,7 +206,7 @@ export default function HomeScreen() {
           <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
         </View>
 
-        <View>
+        <View style={styles.searchRow}>
           <TextInput
             style={styles.searchBar}
             placeholder="Search recipes..."
@@ -150,6 +214,11 @@ export default function HomeScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <TouchableOpacity onPress={openFilters}>
+            <Text style={[styles.categoryButton, activeFilterCount > 0 && styles.categoryButtonSelected]}>
+              Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -179,17 +248,72 @@ export default function HomeScreen() {
           <Text style={styles.recommended}>Recommended recipes</Text>
         </View>
 
-        {loading ? (
+        {loading && recipes.length === 0 ? (
           <Text style={{ margin: 12 }}>Loading recipes...</Text>
         ) : (
           <View>
             <RecipeMenu items={filteredRecipes} />
           </View>
         )}
-        <TouchableOpacity style={{alignSelf: "center"}} onPress={() => void fetchRecipes("All", page)}>
-          <Text style={styles.showMoreButton}>{loading ? "Loading..." : "Show more"}</Text>
-        </TouchableOpacity>
+
+        {hasMore && (
+          <TouchableOpacity
+            style={{ alignSelf: "center" }}
+            onPress={() => void fetchRecipes(page, filters)}
+          >
+            <Text style={styles.showMoreButton}>{loading ? "Loading..." : "Show more"}</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
+
+      <Modal
+        transparent
+        visible={filterVisible}
+        animationType="fade"
+        onRequestClose={() => setFilterVisible(false)}
+      >
+        <Pressable style={styles.backdrop} onPress={() => setFilterVisible(false)}>
+          <Pressable style={styles.modalView} onPress={() => {}}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalTitle}>Filters</Text>
+
+              <FilterGroup
+                title="Difficulty"
+                options={Object.values(Difficulty)}
+                selected={draft.difficulty}
+                onSelect={(v) => setDraft((d) => ({ ...d, difficulty: v }))}
+              />
+              <FilterGroup
+                title="Meal type"
+                options={Object.values(MealType)}
+                selected={draft.meal_type}
+                onSelect={(v) => setDraft((d) => ({ ...d, meal_type: v }))}
+              />
+              <FilterGroup
+                title="Cuisine"
+                options={Object.values(Cuisine)}
+                selected={draft.cuisine}
+                onSelect={(v) => setDraft((d) => ({ ...d, cuisine: v }))}
+              />
+              <FilterGroup
+                title="Dietary tags"
+                options={Object.values(DietaryTags)}
+                selected={draft.dietary_tags}
+                onSelect={(v) => setDraft((d) => ({ ...d, dietary_tags: v }))}
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => setDraft({})}>
+                  <Text style={styles.clearButton}>Clear</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1 }} onPress={applyFilters}>
+                  <Text style={styles.applyButton}>Apply</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -236,6 +360,12 @@ const styles = StyleSheet.create({
     gap: 6,
     flexDirection: "row",
   },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 6,
+  },
   searchBar: {
     flex: 1,
     paddingHorizontal: 12,
@@ -263,6 +393,51 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
-
+  },
+  filterGroup: { marginBottom: 16 },
+  filterGroupTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#252824",
+    marginBottom: 8,
+  },
+  filterOptions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  backdrop: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  modalView: {
+    width: "85%",
+    maxHeight: "80%",
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#252824",
+    marginBottom: 16,
+  },
+  modalActions: { flexDirection: "row", gap: 10, marginTop: 8 },
+  clearButton: {
+    textAlign: "center",
+    padding: 12,
+    borderRadius: 20,
+    overflow: "hidden",
+    backgroundColor: "#F1F1EC",
+    color: "#252824",
+    fontWeight: "bold",
+  },
+  applyButton: {
+    textAlign: "center",
+    padding: 12,
+    borderRadius: 20,
+    overflow: "hidden",
+    backgroundColor: "#2196F3",
+    color: "white",
+    fontWeight: "bold",
   },
 });
