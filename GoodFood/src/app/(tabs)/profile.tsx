@@ -1,8 +1,9 @@
 import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { useState } from 'react'; /*tillstånd*/
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import * as api from '../../databaseAPI/API';
+/*import * as api from '../../databaseAPI/API';*/
 import { useRouter } from 'expo-router';
+/*import { Allergy, Cuisine, DietaryTags } from '@/api/types';*/
 
 
 /*kontrollera att användarinfon inte är tom*/
@@ -36,6 +37,11 @@ const TextInputExample = () => {
   const [avatar, setAvatar] = useState('');                   /*skapar state för avatar-emojin med en standard-emoji*/
   const router = useRouter();
   const [username, setUsername] = useState(''); /*hårdkodad användarnamn för testning, kan ändras till dynamiskt värde senare*/
+  const [selectedDietaryTags, setSelectedDietaryTags] = useState<DietaryTags[]>([]);
+
+/*function toggleAllergy() {
+  setAllergiesOpen((previous) => !previous);
+}*/
 
   return (
     <SafeAreaProvider>
@@ -124,9 +130,8 @@ const TextInputExample = () => {
               editable={isEditing}
             />
 
-
-
           </View>
+          
           
           {/* Knapp som byter text beroende på om vi redigerar eller inte */}
           <Button
@@ -177,16 +182,6 @@ const TextInputExample = () => {
           <Button
               title = {'LOG OUT'} /*text på knappen*/
               onPress={async () => {
-                try {
-                    await api.logoutUser(username); /*anropar API-funktionen för att logga ut användaren*/
-                } catch { //servern nåddes inte, men vi loggar ut ändå
-                  console.error('Logout failed: server unreachable'); /*loggar ett felmeddelande i konsolen*/
-                  if (Platform.OS === 'web') {
-                    window.alert('Logged out locally, but could not sync with the database.');
-                  } else {
-                    Alert.alert('Logged out locally, but could not sync with the database.');
-                    }
-                }
 
                 setFirstName(''); /*nollställer alla fält när man loggar ut*/
                 setLastName('');
@@ -217,6 +212,7 @@ const TextInputExample = () => {
 
                                                                       /*Skapar ett stil-objekt med StyleSheet för att formatera komponenterna*/
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: 'center',
