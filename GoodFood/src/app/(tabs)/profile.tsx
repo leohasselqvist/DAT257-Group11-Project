@@ -1,9 +1,9 @@
 import {View,Button,Text,StyleSheet,TextInput,ScrollView,Pressable,Alert,Platform,} from 'react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { router, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import * as api from '../../databaseAPI/API';
-import { getCurrentUserId } from '../../contexts/UserContext';
+import { getCurrentUserId, clearCurrentUserId} from '../../contexts/UserContext';
 
 function checkUserInfo(
   firstName: string,
@@ -37,6 +37,11 @@ const TextInputExample = () => {
   useEffect(() => {
     async function loadProfile() {
       const userId = getCurrentUserId();
+
+      if (userId == null) {
+        setMessage('You need to log in first.');
+        return;
+      }
 
       try {
         const user = await api.getUserById(userId!);
@@ -202,7 +207,7 @@ const TextInputExample = () => {
           <Button
               title = {'LOG OUT'} /*text på knappen*/
               onPress={async () => {
-
+                clearCurrentUserId();
                 setFirstName(''); /*nollställer alla fält när man loggar ut*/
                 setLastName('');
                 setUsername('');
