@@ -60,3 +60,25 @@ app.get('/favourite',function(req,res){
   const recipes = db.getFavouriteRecipes(userId);
   res.json(recipes);
 });
+
+app.post('/user/update', function(req, res) {
+    const userId = Number(req.body.userId);
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const email = req.body.email;
+    const result = db.updateUserProfile(userId, firstName, lastName, email);
+
+    res.json({ success: result > 0 });
+});
+
+app.get('/user/profile', function(req, res) {
+    const userId = Number(req.query.userId);
+    const user = db.getUserById(userId);
+
+    if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+    }
+
+    res.json(user);
+});

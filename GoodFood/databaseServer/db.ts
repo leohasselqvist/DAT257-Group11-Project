@@ -11,9 +11,7 @@ export function createTables():void{
 //adds a new user to the database and returns status 
 export function addUser(user :{username: string;}): number{
     //create a prepared statement 
-    const pstmt = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)'
-    );
-
+    const pstmt = db.prepare('INSERT INTO users (username) VALUES (?)');
     try { 
         //insert the username into the table
         const r = pstmt.run(user.username);
@@ -86,4 +84,36 @@ export function getFavouriteRecipes(userId:number): number[]{
     } catch (error) {
         return [];
     }
+}
+
+export function updateUserProfile(userId:number, firstName?:string, lastName?:string, email?:string): number{
+
+    if (firstName !== undefined) {
+        const stmt = db.prepare(
+            "UPDATE users SET first_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        );
+        stmt.run(firstName, userId);
+    }
+
+    if (lastName !== undefined) {
+        const stmt = db.prepare(
+            "UPDATE users SET last_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        );
+        stmt.run(lastName, userId);
+    }
+    if (email!== undefined){
+        const stmt = db.prepare(
+            "UPDATE users SET email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        )
+        stmt.run(email,userId);
+    }
+    return 1;
+}
+
+export function getUserById(userId: number) {
+    const stmt = db.prepare(
+        "SELECT id, username, first_name, last_name, email FROM users WHERE id = ?"
+    );
+
+    return stmt.get(userId);
 }

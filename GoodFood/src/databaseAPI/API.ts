@@ -70,3 +70,32 @@ export async function getFavouriteRecipes(userId: number): Promise<number[]> {
     const res = await fetch(API_URL + '/favourite?userId=' + encodeURIComponent(userId));
     return await res.json();
 }
+
+export async function updateUserProfile( userId: number, firstName?: string, lastName?: string, email?: string): Promise<boolean> {
+    const res = await fetch(API_URL + '/user/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            email: email
+        })
+    });
+
+    const data = await res.json();
+    return data.success;
+}
+export async function getUserById(userId: number) {
+    const res = await fetch(
+        API_URL + '/user/profile?userId=' + userId
+    );
+
+    if (!res.ok) {
+        throw new Error("Could not retrieve user");
+    }
+
+    return await res.json();
+}
