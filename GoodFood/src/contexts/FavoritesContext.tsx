@@ -1,4 +1,6 @@
 import React from "react";
+import { getFavouriteRecipes } from "../databaseAPI/API";
+import { getCurrentUserId } from "./UserContext";
 
 type FavoritesContextType = {
   likedIds: number[];
@@ -9,7 +11,16 @@ export const FavoritesContext = React.createContext<FavoritesContextType | undef
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     const [likedIds, setLikedIds] = React.useState<number[]>([]); /*FavoritIdn ligger i likedIds och uppdateras med setfunktionen*/
-
+    React.useEffect(() => {
+        const userId = getCurrentUserId();
+        if (userId === null){
+            return;
+        }
+        getFavouriteRecipes(userId).then((ids) => {
+            setLikedIds(ids);
+        });
+    }, []);
+    
     return (
         <FavoritesContext.Provider value={{ likedIds, setLikedIds }}> 
             {children}

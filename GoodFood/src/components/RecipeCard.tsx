@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -9,14 +9,18 @@ import {
   View,
 } from "react-native";
 import { FavoritesContext } from "../contexts/FavoritesContext";
+import { RecipeContext } from "../contexts/RecipeContext";
+import { getCurrentUserId } from "../contexts/UserContext";
+import { addFavouriteRecipe, removeFavouriteRecipe } from "../databaseAPI/API";
 
 type Ingredient = {
+  id: number; 
   name: string;
   quantity?: number | string;
   unit?: string;
 };
 
-type Recipe = {
+export type Recipe = {
   id: number;
   title: string;
   category?: string;
@@ -29,18 +33,57 @@ type Recipe = {
   instructions?: string[];
 };
 
-export function RecipeCard({ recipe }: { recipe: Recipe }) {
-  const [modalVisible, setModalVisible] = useState(false);
-  const context = useContext(FavoritesContext);
+export function RecipeCard({ 
+    recipe, 
+    showAddButton = false,
+     onAdd, 
+}: { 
+    recipe: Recipe, 
+    showAddButton?: boolean, 
+    onAdd?: (recipeId: number) => void }) {
+    const [modalVisible, setModalVisible] = useState(false);
+    const favoriteContext = useContext(FavoritesContext);
+    const recipeContext = useContext(RecipeContext);
 
-  if (!context) return null;
+    if (!favoriteContext || !recipeContext) return null;
+    const { likedIds, setLikedIds } = favoriteContext;
+    const { saveRecipe } = recipeContext;
 
-  const { likedIds, setLikedIds } = context;
-  const liked = likedIds.includes(recipe.id);
+    const isFavorite = likedIds.includes(recipe.id);
+    const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
+    const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
 
-  const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
-  const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
+    async function toggleFavorite() {
+      const userId = getCurrentUserId();
+      if (userId === null) {
+        return;
+      }
 
+      try {
+      if (isFavorite) {
+        const result = await removeFavouriteRecipe(userId, recipe.id);
+        
+        if (result === -1){
+          throw new Error("Could not unfavorite");
+        }
+
+        setLikedIds((currentIds) => 
+          currentIds.filter((recipeId) => recipeId !== recipe.id));
+      } 
+
+      else {
+        const result = await addFavouriteRecipe(userId, recipe.id);
+        
+        if (result !== 1) {
+          throw new Error("Could not favorite");
+        }
+        saveRecipe(recipe);
+        setLikedIds((currentIds) => [...currentIds, recipe.id]);
+      }
+    } catch (error) {
+    console.error("Favoritanropet misslyckades:", error);
+  }}
+    
   return (
     <>
       <Modal
@@ -110,17 +153,23 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           <Text style={styles.recipeTime}>{recipe.time ?? "N/A"}</Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.likeButtonPosition}
-          onPress={() =>
-            setLikedIds(liked ? likedIds.filter((i) => i !== recipe.id) : [...likedIds, recipe.id])
-          }
-        >
-          <Text style={[styles.likeButton, { color: liked ? "red" : "gray" }]}>♡</Text>
-        </TouchableOpacity>
-      </Pressable>
-    </>
-  );
+            <TouchableOpacity
+                style={styles.likeButtonPosition}
+                onPress={toggleFavorite}
+            >
+                <Text style={[styles.likeButton, { color: isFavorite ? "red" : "gray" }]}>♡</Text>
+            </TouchableOpacity>
+            {showAddButton && (
+                <TouchableOpacity
+                    style={styles.addButtonPosition}
+                    onPress={() => onAdd?.(recipe.id)}
+                    >
+                        <Text style={styles.likeButton}>+</Text>
+                    </TouchableOpacity>
+            )}
+        </Pressable>
+        </>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -167,6 +216,12 @@ const styles = StyleSheet.create({
     bottom: 8,
   },
 
+addButtonPosition: {
+            position: "absolute",
+            right: 50,
+            bottom: 10,
+        },
+        
   backdrop: {
     flex: 1,
     justifyContent: "center",
