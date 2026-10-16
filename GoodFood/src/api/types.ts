@@ -97,8 +97,8 @@ export enum Difficulty {
   easy = "easy",
   medium = "medium",
   hard = "hard",
+  
 }
-
 export enum DietaryTags {
   vegetarian = "vegetarian",
   vegan = "vegan",

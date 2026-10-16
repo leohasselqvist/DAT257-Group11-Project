@@ -1,8 +1,9 @@
 import {View,Button,Text,StyleSheet,TextInput,ScrollView,Pressable,Alert,Platform,} from 'react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import * as api from '../../databaseAPI/API';
-import { getCurrentUserId } from '../../contexts/UserContext';
+import { getCurrentUserId, clearCurrentUserId} from '../../contexts/UserContext';
 
 function checkUserInfo(
   firstName: string,
@@ -24,16 +25,23 @@ const TextInputExample = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('')
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
   const [updatedAt, setUpdatedAt] = useState('');
   const [allergies, setAllergies] = useState('');
   const [avatar, setAvatar] = useState('');
+  const router = useRouter();
 
   // Load the saved profile when the page opens.
   useEffect(() => {
     async function loadProfile() {
       const userId = getCurrentUserId();
+
+      if (userId == null) {
+        setMessage('You need to log in first.');
+        return;
+      }
 
       try {
         const user = await api.getUserById(userId!);
@@ -100,6 +108,16 @@ const TextInputExample = () => {
               editable={isEditing}
             />
 
+
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              placeholderTextColor='grey'
+              value = {username}
+              onChangeText={setUsername}
+              editable={isEditing}
+            />
+
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -119,7 +137,7 @@ const TextInputExample = () => {
               onChangeText={setAllergies}
               editable={isEditing}
             />
-          </View>
+  
 
           <View style={styles.buttonContainer}>
             <Button
@@ -176,31 +194,49 @@ const TextInputExample = () => {
                     window.alert('Your information has been saved.');
                   } else {
                     Alert.alert('Your information has been saved.');
-                  }
+                  }                
+                
                 } catch (error) {
                   setMessage('Could not save profile.');
                   console.error(error);
                 }
               }}
-            />
-          </View>
+          />
 
-          <View style={styles.messageContainer}>
-            <Text>{message}</Text>
 
-            {updatedAt !== '' && (
-              <Text>
-                Your information was last updated: {updatedAt}
-              </Text>
-            )}
-          </View>
-        </ScrollView>
+          <Button
+              title = {'LOG OUT'} /*text på knappen*/
+              onPress={async () => {
+                clearCurrentUserId();
+                setFirstName(''); /*nollställer alla fält när man loggar ut*/
+                setLastName('');
+                setUsername('');
+                setEmail('');
+                setAllergies('');
+                setAvatar('');
+                setMessage('You have been logged out.'); /*meddelande som visas när man loggar ut*/
+                setUpdatedAt(''); /*nollställer updatedAt när man loggar ut*/
+                setIsEditing(false); /*stänger redigeringsläge när man loggar ut*/
+                router.replace('/'); /*navigerar tillbaka till startsidan efter utloggning*/
+              }}  
+          /></View>
+
+
+          <Text>{message}</Text>
+          
+          {/*visar tidsstämpeln endast om updatedAt inte är en tom sträng*/}
+          {updatedAt !== '' && ( /*!== inte lika med, && logisk och/och om*/
+            <Text> Your information was last updated: {updatedAt}</Text>
+          )}
+            </View>
+          </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: 'center',

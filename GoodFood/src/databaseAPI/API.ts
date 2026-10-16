@@ -30,6 +30,18 @@ export async function removeUser(username: string): Promise<number> {
     return data.stat;
 }
 
+/*
+// Logs out a user. Returns 1 if logged out, 0 if no such user.
+export async function logoutUser(username: string): Promise<number> {
+    const res = await fetch(API_URL + '/user/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username }),
+    });
+    const data = await res.json();
+    return data.stat;
+}*/
+
 // Favourites a recipe for a user. recipeId is the recipe's id number.
 // Returns 1 on success, -1 if it failed (already favourited or user doesn't exist).
 export async function addFavouriteRecipe(userId: number, recipeId: number) {
