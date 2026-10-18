@@ -1,9 +1,52 @@
-
 import { climatiqKey } from "./secret";
+import type {
+    EmissionEstimateResponse,
+    EmissionFactorSearchResponse,
+} from "./types";
 
-export async function testClimatiq() {
-  const response = await fetch(
-    "https://api.climatiq.io/mapping-agent/v1/estimate",
+const BASE_URL = "https://api.climatiq.io";
+// const DATA_VERSION = "^38";
+
+export async function estimateIngredientCO2(
+  name: string,
+  weightKg: number
+) {
+  const params = new URLSearchParams({
+    query: name,
+    // data_version: DATA_VERSION,
+    access_type: "public",
+    results_per_page: "10",
+  });
+
+  const searchResponse = await fetch(
+    `${BASE_URL}/data/v1/search?${params}`,
+    {
+      headers: {
+        Authorization: `Bearer ${climatiqKey}`,
+      },
+    }
+  );
+
+  if (!searchResponse.ok) {
+    throw new Error(`Search failed: ${searchResponse.status}`);
+  }
+
+  const searchData =
+    (await searchResponse.json()) as EmissionFactorSearchResponse;
+
+  const factor = searchData.results?.find(
+    (f) => f.access_type === "public" && f.unit_type === "Weight"
+  );
+
+  if (!factor) {
+    return {
+      co2eKg: null,
+      error: "No public weight-based factor found",
+    };
+  }
+
+  const estimateResponse = await fetch(
+    `${BASE_URL}/data/v1/estimate`,
     {
       method: "POST",
       headers: {
@@ -11,26 +54,28 @@ export async function testClimatiq() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        text: "150 g burrata cheese",
-        parameters: {
-          weight: 150,
-          weight_unit: "g",
+        emission_factor: {
+          activity_id: factor.activity_id,
+        //   data_version: DATA_VERSION,
         },
-        explain_results: true,
+        parameters: {
+          weight: weightKg,
+          weight_unit: "kg",
+        },
       }),
     }
   );
 
-  const data = await response.json();
-
-  console.log("Status:", response.status);
-  console.log("Response:", JSON.stringify(data, null, 2));
-
-  if (!response.ok) {
-    throw new Error(
-      `Climatiq request failed: ${response.status}`
-    );
+  if (!estimateResponse.ok) {
+    throw new Error(`Estimate failed: ${estimateResponse.status}`);
   }
 
-  return data;
+  const estimateData =
+    (await estimateResponse.json()) as EmissionEstimateResponse;
+
+  return {
+    co2eKg: estimateData.co2e,
+    matchedFactorName: factor.name,
+    activityId: factor.activity_id,
+  };
 }
