@@ -1,4 +1,4 @@
-import {View,Button,Text,StyleSheet,TextInput,ScrollView,Pressable,Alert,Platform,} from 'react-native';
+import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable, Alert, Platform, Modal } from 'react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -32,6 +32,12 @@ const TextInputExample = () => {
   const [allergies, setAllergies] = useState('');
   const [avatar, setAvatar] = useState('');
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false)
+
+  function showMessage(text:string) {
+    setMessage(text);
+    setModalVisible(true);
+  }
 
   // Load the saved profile when the page opens.
   useEffect(() => {
@@ -145,8 +151,9 @@ const TextInputExample = () => {
               color="#f48208"
               onPress={async () => {
                 if (!isEditing) {
-                  setMessage('You can now change your information.');
+                  showMessage('You can now change your information.');
                   setIsEditing(true);
+
                   return;
                 }
 
@@ -163,11 +170,12 @@ const TextInputExample = () => {
                     missingFields.push('email');
                   }
 
-                  setMessage(
+                  showMessage(
                     missingFields.length > 0
                       ? `Invalid user information. Missing: ${missingFields.join(', ')}`
                       : 'Invalid user information. Check your entered information.'
-                  );
+                    );
+                  
                   return;
                 }
 
@@ -183,30 +191,36 @@ const TextInputExample = () => {
 
                   if (!success) {
                     setMessage('Could not save profile.');
+                    setModalVisible(true);
                     return;
                   }
 
                   setUpdatedAt(new Date().toLocaleString('sv-SE'));
-                  setMessage('Your information has been saved.');
+                  setMessage('OK.');
                   setIsEditing(false);
+                  setModalVisible(true);
+
 
                   if (Platform.OS === 'web') {
-                    window.alert('Your information has been saved.');
+                    window.alert('OK.');
                   } else {
-                    Alert.alert('Your information has been saved.');
+                    Alert.alert('OK.');
                   }                
                 
                 } catch (error) {
                   setMessage('Could not save profile.');
+                  setModalVisible(true);
                   console.error(error);
                 }
               }}
           />
 
-
+          
           <Button
               title = {'LOG OUT'} /*text på knappen*/
               onPress={async () => {
+                setLogoutModalVisible(true);
+                setModalVisible(true);
                 clearCurrentUserId();
                 setFirstName(''); /*nollställer alla fält när man loggar ut*/
                 setLastName('');
@@ -219,17 +233,36 @@ const TextInputExample = () => {
                 setIsEditing(false); /*stänger redigeringsläge när man loggar ut*/
                 router.replace('/'); /*navigerar tillbaka till startsidan efter utloggning*/
               }}  
-          /></View>
+          />
+          </View>
 
 
           <Text>{message}</Text>
-          
+          <Modal
+            animationType = "fade"
+            transparent = {true}
+            visible = {modalVisible}
+            onRequestClose={() => {
+              setModalVisible(false); 
+            }}
+          >
+            <View style = {styles.modalCenteredView}> 
+              <View style = {styles.modalView}>
+                <Text style = {styles.modalText}>{message}</Text>
+                <Button
+                  title='OK'
+                  onPress={() => setModalVisible(false)}
+                  color = "orange"
+              />
+              </View>
+            </View>
+          </Modal>  
           {/*visar tidsstämpeln endast om updatedAt inte är en tom sträng*/}
           {updatedAt !== '' && ( /*!== inte lika med, && logisk och/och om*/
             <Text> Your information was last updated: {updatedAt}</Text>
           )}
-            </View>
-          </ScrollView>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -274,10 +307,32 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   messageContainer: {
+    flex: 1, 
+    justifyContent: 'center',
+    padding: 20,
     alignItems: 'center',
-    padding: 10,
-    gap: 8,
   },
+  modalCenteredView: {
+    flex : 1, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white'
+  },
+
+  modalView: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    alignItems: 'center'
+  },
+
+  modalText: {
+    marginBottom: 20, 
+    textAlign: 'center', 
+    fontSize: 16, 
+    color: 'black',
+  }
 });
 
 export default TextInputExample;
