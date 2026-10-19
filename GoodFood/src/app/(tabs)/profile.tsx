@@ -276,6 +276,7 @@ function handleLogout(){
               <Button
               title="Yes, logout"
               onPress={handleLogout}
+              color = "red"
               />
               </View>
             </View>
