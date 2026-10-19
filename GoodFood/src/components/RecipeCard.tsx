@@ -73,7 +73,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         try {
           const value = await fetchWithRetry(query);
-          await sleep(700); // the pause between requests
+          await sleep(700);
 
           const d = value.data ?? value;
           console.log("OK", i.name, d.calories, d.totalWeight);
