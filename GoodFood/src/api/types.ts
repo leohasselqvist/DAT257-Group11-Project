@@ -28,8 +28,6 @@ export interface APIResponse<T> {
 }
 
 
-// Above is for dietly api, below is for recipe api
-
 export interface RecipeIngredient {
   id: number;
   name: string;
@@ -159,3 +157,26 @@ export interface RecipeFilters {
   per_page?: number;
   page?: number;
 }
+
+
+
+// ============================================================
+// CO2 estimation types
+// ============================================================
+
+export interface EmissionFactor {
+  activity_id: string;
+  name: string;
+  unit_type?: string;
+  access_type: "public" | "private";
+}
+
+export interface EmissionFactorSearchResponse {
+  results: EmissionFactor[];
+}
+
+export interface EmissionEstimateResponse {
+  co2e: number;
+  co2e_unit: string;
+}
+

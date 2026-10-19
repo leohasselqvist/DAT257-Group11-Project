@@ -14,6 +14,7 @@ import { Edamam } from "../api/apiService";
 import { RecipeContext } from "../contexts/RecipeContext";
 import { getCurrentUserId } from "../contexts/UserContext";
 import { addFavouriteRecipe, removeFavouriteRecipe } from "../databaseAPI/API";
+import { CO2Button } from "./CO2Button";
 
 type Ingredient = {
   name: string;
@@ -216,6 +217,9 @@ export function RecipeCard({
                   ))}
                 </>
               )}
+
+              <CO2Button ingredients={recipe.ingredients} />
+            
 
                 <Text style={styles.sectionTitle}>Nutrition</Text>
 
