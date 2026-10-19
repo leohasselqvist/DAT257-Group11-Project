@@ -1,6 +1,6 @@
 import { estimateIngredientCO2 } from "../../api/climatiq";
 import type { RecipeIngredient } from "../../api/types";
-import { toKg } from "./unitConversion";
+import toKg from "./unitConversion";
 
 export interface IngredientCO2Estimate {
   ingredientId: number;

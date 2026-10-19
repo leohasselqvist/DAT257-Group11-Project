@@ -1,11 +1,11 @@
 import { climatiqKey } from "./secret";
 import type {
-    EmissionEstimateResponse,
-    EmissionFactorSearchResponse,
+  EmissionEstimateResponse,
+  EmissionFactorSearchResponse,
 } from "./types";
 
 const BASE_URL = "https://api.climatiq.io";
-// const DATA_VERSION = "^38";
+const DATA_VERSION = "^38";
 
 export async function estimateIngredientCO2(
   name: string,
@@ -13,7 +13,7 @@ export async function estimateIngredientCO2(
 ) {
   const params = new URLSearchParams({
     query: name,
-    // data_version: DATA_VERSION,
+    data_version: DATA_VERSION,
     access_type: "public",
     results_per_page: "10",
   });
@@ -41,7 +41,7 @@ export async function estimateIngredientCO2(
   if (!factor) {
     return {
       co2eKg: null,
-      error: "No public weight-based factor found",
+      error: "No suitable match found for our search",
     };
   }
 
@@ -56,7 +56,7 @@ export async function estimateIngredientCO2(
       body: JSON.stringify({
         emission_factor: {
           activity_id: factor.activity_id,
-        //   data_version: DATA_VERSION,
+          data_version: DATA_VERSION,
         },
         parameters: {
           weight: weightKg,

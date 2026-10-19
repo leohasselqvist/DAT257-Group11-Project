@@ -10,9 +10,29 @@ export default function toKg(quantity: number, unit: string): number | null {
     case "kilograms":
       return quantity;
 
+    case "lb":
+    case "pound":
+    case "pounds":
+      return (quantity * 450)/ 1000;
+
     // Approximate conversions 
     case "ml":
       return quantity / 1000;
+
+    case "cl":
+    case "centiliter":
+    case "centiliters":
+      return quantity / 100;
+
+    case "dl":
+    case "deciliter":
+    case "deciliters":
+      return quantity / 100;
+
+    case "l":
+    case "liter":
+    case "liters":
+      return quantity;
 
     case "tbsp":
     case "tablespoon":
@@ -48,6 +68,19 @@ export default function toKg(quantity: number, unit: string): number | null {
     case "piece":
     case "pieces":
       return (quantity * 100) / 1000;
+
+    case "clove":
+    case "cloves":
+      return (quantity * 5) / 1000;
+
+    case "bunch":
+    case "bunches":
+      return (quantity * 50) / 1000;
+
+    case "sprig":
+    case "sprigs":
+      return (quantity * 10) / 1000;
+
 
     default:
       return null;

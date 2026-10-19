@@ -1,63 +1,48 @@
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Text,
-    TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Text,
+  TouchableOpacity,
 } from "react-native";
 
 import type { RecipeIngredient } from "../api/types";
 import { estimateRecipeCO2 } from "../app/helpers/estimateRecipeCO2";
+
+import type { RecipeCO2Estimate } from "../app/helpers/estimateRecipeCO2";
+import { CO2Modal } from "./CO2Modal";
+
+// Inside CO2Button:
+
 
 interface CO2ButtonProps {
   ingredients: RecipeIngredient[];
 }
 
 export function CO2Button({ ingredients }: CO2ButtonProps) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [result, setResult] = useState<RecipeCO2Estimate | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handlePress() {
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const result = await estimateRecipeCO2(ingredients);
-
-      const details = result.ingredients
-        .map((ingredient) => {
-          const amount =
-            `${ingredient.quantity} ${ingredient.unit} ` +
-            ingredient.ingredientName;
-
-          if (ingredient.co2eKg === null) {
-            return `${amount}: ${ingredient.error ?? "Not found"}`;
-          }
-
-          return (
-            `${amount}: ${ingredient.co2eKg.toFixed(4)} kg CO2e\n` +
-            `Factor: ${ingredient.matchedFactorName}`
-          );
-        })
-        .join("\n\n");
-
-      Alert.alert(
-        "Recipe CO2 estimate",
-        `Total: ${result.totalCO2eKg.toFixed(3)} kg CO2e\n` +
-          `Coverage: ${result.estimatedCount}/${result.totalCount} ingredients\n\n` +
-          details
-      );
-    } catch (error) {
-      Alert.alert(
-        "Error",
-        error instanceof Error
-          ? error.message
-          : "Could not estimate emissions."
-      );
-    } finally {
-      setLoading(false);
-    }
+  try {
+    const estimate = await estimateRecipeCO2(ingredients);
+    setResult(estimate);
+    setModalVisible(true);
+  } catch (error) {
+    Alert.alert(
+      "CO₂ estimation failed",
+      error instanceof Error ? error.message : "Something went wrong."
+    );
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
+    <>
     <TouchableOpacity
       onPress={handlePress}
       disabled={loading}
@@ -74,5 +59,12 @@ export function CO2Button({ ingredients }: CO2ButtonProps) {
         <Text>Estimate CO₂ footprint</Text>
       )}
     </TouchableOpacity>
+
+    <CO2Modal
+      visible={modalVisible}
+      onClose={() => setModalVisible(false)}
+      result={result}
+    />
+  </>
   );
 }
