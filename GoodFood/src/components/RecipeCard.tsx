@@ -22,6 +22,7 @@ export type Recipe = {
   id: number;
   title: string;
   category?: string;
+  servings?: number;
   calories?: number;
   protein?: number;
   carbs?: number;
@@ -39,24 +40,64 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const context = useContext(FavoritesContext);
+  const [failed, setFailed] = useState<string[]>([]);
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const fetchWithRetry = async (query: string, retries = 2) => {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await Edamam.GetNutritionFromIngredients(query);
+      } catch (e: any) {
+        const is429 = String(e?.message ?? e).includes("429");
+        if (!is429 || attempt === retries) throw e;
+        await sleep(1500 * (attempt + 1)); // waits 2s, 4s, 6s
+      }
+    }
+  };
 
   const fetchNutrition = async () => {
     if (!recipe.ingredients?.length || loading) return;
     setLoading(true);
     setError(false);
+    setFailed([]);
     try {
-      const results: any[] = await Promise.all(
-        recipe.ingredients.map((i) =>
-          Edamam.GetNutritionFromIngredients(
-            [i.quantity, i.unit, i.name]
-              .filter((v) => v !== undefined && v !== null && v !== "")
-              .join(" ")
-          )
-        )
-      );
+      const ingredients = recipe.ingredients;
+      const good: any[] = [];
+      const failedNames: string[] = [];
 
+      for (const i of ingredients) {
+        const query = [i.quantity, i.unit, i.name]
+          .filter((v) => v !== undefined && v !== null && v !== "")
+          .join(" ");
+
+        try {
+          const value = await fetchWithRetry(query);
+          await sleep(700); // the pause between requests
+
+          const d = value.data ?? value;
+          console.log("OK", i.name, d.calories, d.totalWeight);
+          if (!d.totalWeight) {
+            failedNames.push(i.name);
+            continue;
+          }
+          good.push(d);
+        } catch (e: any) {
+          console.log("REJECTED", i.name, e?.message ?? e);
+          failedNames.push(i.name);
+        }
+      }
+
+      setFailed(failedNames);
+
+      if (good.length === 0) {
+        setError(true);
+        return;
+      }
+
+      const servings = recipe.servings && recipe.servings > 0 ? recipe.servings : 1;
       const sum = (pick: (d: any) => number | undefined) =>
-        results.reduce((total, r) => total + (pick(r.data ?? r) ?? 0), 0);
+        good.reduce((total, d) => total + (pick(d) ?? 0), 0);
 
       setNutrition({
         calories: sum((d) => d.calories),
@@ -79,10 +120,19 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
   const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
 
-  const calories = nutrition ? Math.round(nutrition.calories) : recipe.calories ?? 0;
-  const protein = nutrition ? Math.round(nutrition.protein) : recipe.protein ?? 0;
-  const carbs = nutrition ? Math.round(nutrition.carbs) : recipe.carbs ?? 0;
-  const fat = nutrition ? Math.round(nutrition.fat) : recipe.fat ?? 0;
+  const servings =
+    recipe.servings && recipe.servings > 0
+      ? recipe.servings
+      : nutrition && recipe.calories && recipe.calories > 0
+      ? Math.max(1, Math.round(nutrition.calories / recipe.calories))
+      : undefined;
+
+  const div = servings ?? 1;
+
+  const calories = nutrition ? Math.round(nutrition.calories / div) : recipe.calories ?? 0;
+  const protein = nutrition ? Math.round(nutrition.protein / div) : recipe.protein ?? 0;
+  const carbs = nutrition ? Math.round(nutrition.carbs / div) : recipe.carbs ?? 0;
+  const fat = nutrition ? Math.round(nutrition.fat / div) : recipe.fat ?? 0;
 
   return (
     <>
@@ -141,8 +191,18 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
                   <Text style={styles.macroValue}>{fat} g</Text>
                 </View>
 
-                {error && <Text style={styles.errorText}>Couldn't load nutrition data.</Text>}
+                {servings !== undefined && (
+                  <Text style={styles.servingsText}>
+                    Nutrients in total, makes {servings} {servings === 1 ? "serving" : "servings"}
+                  </Text>
+                )}
 
+                {error && <Text style={styles.errorText}>Couldn't load nutrition data.</Text>}
+                {failed.length > 0 && (
+                  <Text style={styles.errorText}>
+                    Couldn't calculate: {failed.join(", ")}. These are left out of the totals.
+                  </Text>
+                )}
                 {hasIngredients && !nutrition && (
                   <Pressable style={styles.fetchButton} onPress={fetchNutrition} disabled={loading}>
                     {loading ? (
@@ -308,5 +368,10 @@ const styles = StyleSheet.create({
   fetchButtonText: {
     color: "white",
     fontWeight: "600",
+  },
+    servingsText: {
+    marginTop: 10,
+    fontSize: 13,
+    color: "#3a3f39",
   },
 });
