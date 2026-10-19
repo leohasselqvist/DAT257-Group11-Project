@@ -41,6 +41,7 @@ type RecipeUI = {
   fat: number;
   time: string;
   ingredients?: Array<{
+    id: number;
     name: string;
     quantity?: number | string;
     unit?: string;
@@ -67,6 +68,7 @@ function mapApiRecipeToCard(apiRecipe: any): RecipeUI {
     time: `${(apiRecipe.prep_time ?? 0) + (apiRecipe.cook_time ?? 0)} min`,
     ingredients: Array.isArray(apiRecipe.ingredients)
       ? apiRecipe.ingredients.map((ingredient: any) => ({
+          id: ingredient.id, //Is needed to identify the ingredient in the shopping list.
           name: ingredient.name ?? "Ingredient",
           quantity: ingredient.quantity ?? "",
           unit: ingredient.unit ?? "",
@@ -124,7 +126,7 @@ function FilterGroup<T extends string>({
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = React.useState<CategoryKey>("All");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [recipes, setRecipes] = React.useState<any[]>([]);
+  const [recipes, setRecipes] = React.useState<any[]>([]); 
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
 

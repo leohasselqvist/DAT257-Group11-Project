@@ -8,6 +8,6 @@ export namespace Edamam {
 }
 export namespace OtherAPI {  // bytt namn här
 
-  // lägg funktioner här
+//   // lägg funktioner här
 
 }

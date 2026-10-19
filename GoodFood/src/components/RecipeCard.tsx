@@ -11,6 +11,9 @@ import {
 } from "react-native";
 import { FavoritesContext } from "../contexts/FavoritesContext";
 import { Edamam } from "../api/apiService";
+import { RecipeContext } from "../contexts/RecipeContext";
+import { getCurrentUserId } from "../contexts/UserContext";
+import { addFavouriteRecipe, removeFavouriteRecipe } from "../databaseAPI/API";
 
 type Ingredient = {
   name: string;
@@ -32,15 +35,25 @@ export type Recipe = {
   instructions?: string[];
 };
 
-export function RecipeCard({ recipe }: { recipe: Recipe }) {
+
+export function RecipeCard({ 
+    recipe,
+    showAddButton = false,
+      onAdd,
+}: {
+    recipe: Recipe,
+    showAddButton?: boolean,
+    onAdd?: (recipeId: number) => void }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [nutrition, setNutrition] = useState<{
     calories: number; protein: number; carbs: number; fat: number;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const context = useContext(FavoritesContext);
   const [failed, setFailed] = useState<string[]>([]);
+
+  const favoriteContext = useContext(FavoritesContext);
+  const recipeContext = useContext(RecipeContext);
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -112,10 +125,11 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     }
   };
 
-  if (!context) return null;
+  if (!favoriteContext || !recipeContext) return null;
 
-  const { likedIds, setLikedIds } = context;
-  const liked = likedIds.includes(recipe.id);
+  const { likedIds, setLikedIds } = favoriteContext;
+  const { saveRecipe } = recipeContext;
+  const isFavorite = likedIds.includes(recipe.id);
 
   const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
   const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
@@ -133,6 +147,37 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const protein = nutrition ? Math.round(nutrition.protein / div) : recipe.protein ?? 0;
   const carbs = nutrition ? Math.round(nutrition.carbs / div) : recipe.carbs ?? 0;
   const fat = nutrition ? Math.round(nutrition.fat / div) : recipe.fat ?? 0;
+
+  async function toggleFavorite() {
+      const userId = getCurrentUserId();
+      if (userId === null) {
+        return;
+      }
+
+      try {
+      if (isFavorite) {
+        const result = await removeFavouriteRecipe(userId, recipe.id);
+        
+        if (result === -1){
+          throw new Error("Could not unfavorite");
+        }
+
+        setLikedIds((currentIds) => 
+          currentIds.filter((recipeId) => recipeId !== recipe.id));
+      } 
+
+      else {
+        const result = await addFavouriteRecipe(userId, recipe.id);
+        
+        if (result !== 1) {
+          throw new Error("Could not favorite");
+        }
+        saveRecipe(recipe);
+        setLikedIds((currentIds) => [...currentIds, recipe.id]);
+      }
+    } catch (error) {
+    console.error("Favoritanropet misslyckades:", error);
+  }}
 
   return (
     <>
@@ -235,12 +280,18 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         <TouchableOpacity
           style={styles.likeButtonPosition}
-          onPress={() =>
-            setLikedIds(liked ? likedIds.filter((i) => i !== recipe.id) : [...likedIds, recipe.id])
-          }
+          onPress={toggleFavorite}
         >
-          <Text style={[styles.likeButton, { color: liked ? "red" : "gray" }]}>♡</Text>
+          <Text style={[styles.likeButton, { color: isFavorite ? "red" : "gray" }]}>♡</Text>
         </TouchableOpacity>
+        {showAddButton && (
+          <TouchableOpacity
+            style={styles.addButtonPosition}
+            onPress={() => onAdd?.(recipe.id)}
+            >
+              <Text style={styles.likeButton}>+</Text>
+          </TouchableOpacity>
+        )}
       </Pressable>
     </>
   );
@@ -288,6 +339,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 10,
     bottom: 8,
+  },
+  addButtonPosition: {
+            position: "absolute",
+            right: 50,
+            bottom: 10,
   },
 
   backdrop: {
