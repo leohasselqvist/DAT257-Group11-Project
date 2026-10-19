@@ -1,10 +1,9 @@
-import { View, Button, Text, StyleSheet, TextInput, ScrollView, Pressable, Alert, Platform, Modal } from 'react-native';
-import { useState, useEffect } from 'react';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, Button, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { clearCurrentUserId, getCurrentUserId } from '../../contexts/UserContext';
 import * as api from '../../databaseAPI/API';
-import { getCurrentUserId, clearCurrentUserId} from '../../contexts/UserContext';
-import { colors } from "../../constants/colors";
 function checkUserInfo(
   firstName: string,
   lastName: string,
@@ -33,6 +32,7 @@ const TextInputExample = () => {
   const [avatar, setAvatar] = useState('');
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false)
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   function showMessage(text:string) {
     setMessage(text);
@@ -64,6 +64,21 @@ const TextInputExample = () => {
     loadProfile();
   }, []);
 
+function handleLogout(){
+                setLogoutModalVisible(false);
+                clearCurrentUserId();
+                setFirstName(''); /*nollställer alla fält när man loggar ut*/
+                setLastName('');
+                setUsername('');
+                setEmail('');
+                setAllergies('');
+                setAvatar('');
+                setMessage('You have been logged out.'); /*meddelande som visas när man loggar ut*/
+                setUpdatedAt(''); /*nollställer updatedAt när man loggar ut*/
+                setIsEditing(false); /*stänger redigeringsläge när man loggar ut*/
+                router.replace('/'); /*navigerar tillbaka till startsidan efter utloggning*/
+              }
+              
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
@@ -218,22 +233,8 @@ const TextInputExample = () => {
           
           <Button
               title = {'LOG OUT'} /*text på knappen*/
-              onPress={async () => {
-                setLogoutModalVisible(true);
-                setModalVisible(true);
-                clearCurrentUserId();
-                setFirstName(''); /*nollställer alla fält när man loggar ut*/
-                setLastName('');
-                setUsername('');
-                setEmail('');
-                setAllergies('');
-                setAvatar('');
-                setMessage('You have been logged out.'); /*meddelande som visas när man loggar ut*/
-                setUpdatedAt(''); /*nollställer updatedAt när man loggar ut*/
-                setIsEditing(false); /*stänger redigeringsläge när man loggar ut*/
-                router.replace('/'); /*navigerar tillbaka till startsidan efter utloggning*/
-              }}  
-          />
+              onPress={async () => setLogoutModalVisible(true)}
+              />
           </View>
 
 
@@ -257,6 +258,29 @@ const TextInputExample = () => {
               </View>
             </View>
           </Modal>  
+
+          <Modal
+            animationType = "fade"
+            transparent = {true}
+            visible = {logoutModalVisible}
+            onRequestClose={() => 
+              setLogoutModalVisible(false)}
+          >
+            <View style = {styles.modalCenteredView}> 
+              <View style = {styles.modalView}>
+                <Text style = {styles.modalText}>{"Do you want to log out?"}</Text>
+                <Button
+                  title='cancel'
+                  onPress={() => setLogoutModalVisible(false)}
+              />
+              <Button
+              title="Yes, logout"
+              onPress={handleLogout}
+              />
+              </View>
+            </View>
+          </Modal> 
+          
           {/*visar tidsstämpeln endast om updatedAt inte är en tom sträng*/}
           {updatedAt !== '' && ( /*!== inte lika med, && logisk och/och om*/
             <Text> Your information was last updated: {updatedAt}</Text>
