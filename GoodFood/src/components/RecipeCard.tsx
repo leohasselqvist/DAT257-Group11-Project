@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
@@ -9,6 +10,11 @@ import {
   View,
 } from "react-native";
 import { FavoritesContext } from "../contexts/FavoritesContext";
+import { Edamam } from "../api/apiService";
+import { RecipeContext } from "../contexts/RecipeContext";
+import { getCurrentUserId } from "../contexts/UserContext";
+import { addFavouriteRecipe, removeFavouriteRecipe } from "../databaseAPI/API";
+import { CO2Button } from "./CO2Button";
 
 type Ingredient = {
   name: string;
@@ -16,10 +22,11 @@ type Ingredient = {
   unit?: string;
 };
 
-type Recipe = {
+export type Recipe = {
   id: number;
   title: string;
   category?: string;
+  servings?: number;
   calories?: number;
   protein?: number;
   carbs?: number;
@@ -29,17 +36,149 @@ type Recipe = {
   instructions?: string[];
 };
 
-export function RecipeCard({ recipe }: { recipe: Recipe }) {
+
+export function RecipeCard({ 
+    recipe,
+    showAddButton = false,
+      onAdd,
+}: {
+    recipe: Recipe,
+    showAddButton?: boolean,
+    onAdd?: (recipeId: number) => void }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const context = useContext(FavoritesContext);
+  const [nutrition, setNutrition] = useState<{
+    calories: number; protein: number; carbs: number; fat: number;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [failed, setFailed] = useState<string[]>([]);
 
-  if (!context) return null;
+  const favoriteContext = useContext(FavoritesContext);
+  const recipeContext = useContext(RecipeContext);
 
-  const { likedIds, setLikedIds } = context;
-  const liked = likedIds.includes(recipe.id);
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const fetchWithRetry = async (query: string, retries = 2) => {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await Edamam.GetNutritionFromIngredients(query);
+      } catch (e: any) {
+        const is429 = String(e?.message ?? e).includes("429");
+        if (!is429 || attempt === retries) throw e;
+        await sleep(1500 * (attempt + 1)); // waits 2s, 4s, 6s
+      }
+    }
+  };
+
+  const fetchNutrition = async () => {
+    if (!recipe.ingredients?.length || loading) return;
+    setLoading(true);
+    setError(false);
+    setFailed([]);
+    try {
+      const ingredients = recipe.ingredients;
+      const good: any[] = [];
+      const failedNames: string[] = [];
+
+      for (const i of ingredients) {
+        const query = [i.quantity, i.unit, i.name]
+          .filter((v) => v !== undefined && v !== null && v !== "")
+          .join(" ");
+
+        try {
+          const value = await fetchWithRetry(query);
+          await sleep(700);
+
+          const d = value.data ?? value;
+          console.log("OK", i.name, d.calories, d.totalWeight);
+          if (!d.totalWeight) {
+            failedNames.push(i.name);
+            continue;
+          }
+          good.push(d);
+        } catch (e: any) {
+          console.log("REJECTED", i.name, e?.message ?? e);
+          failedNames.push(i.name);
+        }
+      }
+
+      setFailed(failedNames);
+
+      if (good.length === 0) {
+        setError(true);
+        return;
+      }
+
+      const servings = recipe.servings && recipe.servings > 0 ? recipe.servings : 1;
+      const sum = (pick: (d: any) => number | undefined) =>
+        good.reduce((total, d) => total + (pick(d) ?? 0), 0);
+
+      setNutrition({
+        calories: sum((d) => d.calories),
+        protein: sum((d) => d.totalNutrients?.PROCNT?.quantity),
+        carbs: sum((d) => d.totalNutrients?.CHOCDF?.quantity),
+        fat: sum((d) => d.totalNutrients?.FAT?.quantity),
+      });
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!favoriteContext || !recipeContext) return null;
+
+  const { likedIds, setLikedIds } = favoriteContext;
+  const { saveRecipe } = recipeContext;
+  const isFavorite = likedIds.includes(recipe.id);
 
   const hasIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0;
   const hasInstructions = Array.isArray(recipe.instructions) && recipe.instructions.length > 0;
+
+  const servings =
+    recipe.servings && recipe.servings > 0
+      ? recipe.servings
+      : nutrition && recipe.calories && recipe.calories > 0
+      ? Math.max(1, Math.round(nutrition.calories / recipe.calories))
+      : undefined;
+
+  const div = servings ?? 1;
+
+  const calories = nutrition ? Math.round(nutrition.calories / div) : recipe.calories ?? 0;
+  const protein = nutrition ? Math.round(nutrition.protein / div) : recipe.protein ?? 0;
+  const carbs = nutrition ? Math.round(nutrition.carbs / div) : recipe.carbs ?? 0;
+  const fat = nutrition ? Math.round(nutrition.fat / div) : recipe.fat ?? 0;
+
+  async function toggleFavorite() {
+      const userId = getCurrentUserId();
+      if (userId === null) {
+        return;
+      }
+
+      try {
+      if (isFavorite) {
+        const result = await removeFavouriteRecipe(userId, recipe.id);
+        
+        if (result === -1){
+          throw new Error("Could not unfavorite");
+        }
+
+        setLikedIds((currentIds) => 
+          currentIds.filter((recipeId) => recipeId !== recipe.id));
+      } 
+
+      else {
+        const result = await addFavouriteRecipe(userId, recipe.id);
+        
+        if (result !== 1) {
+          throw new Error("Could not favorite");
+        }
+        saveRecipe(recipe);
+        setLikedIds((currentIds) => [...currentIds, recipe.id]);
+      }
+    } catch (error) {
+    console.error("Favoritanropet misslyckades:", error);
+  }}
 
   return (
     <>
@@ -79,16 +218,49 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
                 </>
               )}
 
+              <CO2Button ingredients={recipe.ingredients} />
+            
+
                 <Text style={styles.sectionTitle}>Nutrition</Text>
 
                 <View style={styles.macroRow}>
                   <Text style={styles.macroLabel}>Calories</Text>
-                  <Text style={styles.macroValue}>{recipe.calories ?? 0} kcal</Text>
+                  <Text style={styles.macroValue}>{calories} kcal</Text>
                 </View>
                 <View style={styles.macroRow}>
                   <Text style={styles.macroLabel}>Protein</Text>
-                  <Text style={styles.macroValue}>{recipe.protein ?? 0} g</Text>
+                  <Text style={styles.macroValue}>{protein} g</Text>
                 </View>
+                <View style={styles.macroRow}>
+                  <Text style={styles.macroLabel}>Carbohydrates</Text>
+                  <Text style={styles.macroValue}>{carbs} g</Text>
+                </View>
+                <View style={styles.macroRow}>
+                  <Text style={styles.macroLabel}>Fat</Text>
+                  <Text style={styles.macroValue}>{fat} g</Text>
+                </View>
+
+                {servings !== undefined && (
+                  <Text style={styles.servingsText}>
+                    Nutrients in total, makes {servings} {servings === 1 ? "serving" : "servings"}
+                  </Text>
+                )}
+
+                {error && <Text style={styles.errorText}>Couldn't load nutrition data.</Text>}
+                {failed.length > 0 && (
+                  <Text style={styles.errorText}>
+                    Couldn't calculate: {failed.join(", ")}. These are left out of the totals.
+                  </Text>
+                )}
+                {hasIngredients && !nutrition && (
+                  <Pressable style={styles.fetchButton} onPress={fetchNutrition} disabled={loading}>
+                    {loading ? (
+                      <ActivityIndicator color="white" />
+                    ) : (
+                      <Text style={styles.fetchButtonText}>Calculate exact nutrition</Text>
+                    )}
+                  </Pressable>
+                )}
               <Pressable
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
@@ -112,12 +284,18 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         <TouchableOpacity
           style={styles.likeButtonPosition}
-          onPress={() =>
-            setLikedIds(liked ? likedIds.filter((i) => i !== recipe.id) : [...likedIds, recipe.id])
-          }
+          onPress={toggleFavorite}
         >
-          <Text style={[styles.likeButton, { color: liked ? "red" : "gray" }]}>♡</Text>
+          <Text style={[styles.likeButton, { color: isFavorite ? "red" : "gray" }]}>♡</Text>
         </TouchableOpacity>
+        {showAddButton && (
+          <TouchableOpacity
+            style={styles.addButtonPosition}
+            onPress={() => onAdd?.(recipe.id)}
+            >
+              <Text style={styles.likeButton}>+</Text>
+          </TouchableOpacity>
+        )}
       </Pressable>
     </>
   );
@@ -165,6 +343,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 10,
     bottom: 8,
+  },
+  addButtonPosition: {
+            position: "absolute",
+            right: 50,
+            bottom: 10,
   },
 
   backdrop: {
@@ -230,5 +413,25 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  errorText: {
+  color: "red",
+  marginTop: 10,
+  },
+  fetchButton: {
+    marginTop: 14,
+    borderRadius: 20,
+    padding: 12,
+    backgroundColor: "#252824",
+    alignItems: "center",
+  },
+  fetchButtonText: {
+    color: "white",
+    fontWeight: "600",
+  },
+    servingsText: {
+    marginTop: 10,
+    fontSize: 13,
+    color: "#3a3f39",
   },
 });

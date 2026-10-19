@@ -50,7 +50,7 @@ All response types for the Api's is laid out in ``types.ts`` so that we only rec
 
 ## Secret
 
-A file called `secrets.ts` containing API keys which **should never be tracked by git!!** If you need one ask Leo.
+A file called `secret.ts` containing API keys which **should never be tracked by git!!** If you need one ask Leo.
 
 ## Why is it like this?
 This is to make it as easy as possible for the developers making other components, as well as making future API integrations easier and more centralized.

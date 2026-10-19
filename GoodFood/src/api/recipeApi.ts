@@ -1,5 +1,5 @@
 import { FetchRecipeAPI } from "./apiClient";
-import { Recipe, RecipeResponse, RecipeFilters } from "./types";
+import { Recipe, RecipeFilters, RecipeResponse } from "./types";
 
 
 
@@ -18,4 +18,12 @@ export async function getRecipes(filters?: RecipeFilters): Promise<RecipeRespons
   }
 
   return FetchRecipeAPI<RecipeResponse>("api/v1/recipes", query);
+}
+
+//Get a recipe based on recipeId
+export async function getRecipeById(id: number): Promise<Recipe> {
+  const response = await FetchRecipeAPI<{ data: Recipe }>(
+    "api/v1/recipes/" + id
+  );
+  return response.data;
 }

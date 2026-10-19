@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { getRecipes } from "../../api/recipeApi";
-import { Difficulty,  DietaryTags, Sort, Order } from "../../api/types";
+import { DietaryTags, Difficulty, Order, Sort } from "../../api/types";
 
 export default function ApiTesting() {
   useEffect(() => {
@@ -53,3 +53,5 @@ export default function ApiTesting() {
     </View>
   );
 }
+
+
