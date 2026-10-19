@@ -1,26 +1,26 @@
 import React from "react";
 import {
-  ScrollView,               /*möjliggör scroll*/
-  Text,                     /*visa och styla text*/
-  TextInput,                /*inmatning*/
-  TouchableOpacity,         /*osynlig knapp som tonar*/
-  View,                      /*grupperar, strukturerar och stylar andra komponenter*/
-  StyleSheet,
   Image,
   Modal,
   Pressable,
+  ScrollView, /*grupperar, strukturerar och stylar andra komponenter*/
+  StyleSheet, /*möjliggör scroll*/
+  Text, /*visa och styla text*/
+  TextInput, /*inmatning*/
+  TouchableOpacity, /*osynlig knapp som tonar*/
+  View, /*grupperar, strukturerar och stylar andra komponenter*/
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RecipeCard } from "../../components/RecipeCard";
 import { getRecipes } from "../../api/recipeApi";
 import {
-  MealType,
   Cuisine,
-  Difficulty,
   DietaryTags,
+  Difficulty,
+  MealType,
   RecipeFilters,
 } from "../../api/types";
-
+import { RecipeCard } from "../../components/RecipeCard";
+import { colors } from "../../constants/colors";
 type CategoryKey = "All" | "Breakfast" | "Lunch & Dinner" | "Light meal" | "Snack";
 
 const categoryButtons: Array<{ label: CategoryKey; apiValue?: MealType }> = [

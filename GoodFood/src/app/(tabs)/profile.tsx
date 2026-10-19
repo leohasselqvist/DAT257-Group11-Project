@@ -4,7 +4,7 @@ import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as api from '../../databaseAPI/API';
 import { getCurrentUserId, clearCurrentUserId} from '../../contexts/UserContext';
-
+import { colors } from "../../constants/colors";
 function checkUserInfo(
   firstName: string,
   lastName: string,
