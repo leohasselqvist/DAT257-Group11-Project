@@ -1,9 +1,10 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Recipe, RecipeCard } from "../../components/RecipeCard";
+import { colors } from "../../constants/colors";
 import { FavoritesContext } from "../../contexts/FavoritesContext";
 import { RecipeContext } from "../../contexts/RecipeContext";
-import { colors } from "../../constants/colors";
 type ShoppingListItem = {
     ingredientId: number;
     name: string;
@@ -76,9 +77,18 @@ export default function Favorites() {
         setShoppingList(newShoppingList);
     }
     return (
+        <SafeAreaView style={styles.container}>
         <ScrollView>
+            <View style={styles.header}>
+                <Text style={styles.favTitle}>Your favorites! </Text>
+                <Text style={styles.underTitle}>{favoriteRecipes.length} saved recipes!</Text>
+            </View>
             <View style={styles.layout}>
                 <View style={styles.grid}>
+                    {favoriteRecipes.length === 0 && 
+                    (<Text style={styles.textEmpty}>
+                        You haven't favorited any recipes yet!
+                    </Text>)}
                     {favoriteRecipes.map((r) => (
                     <RecipeCard key={r.id} recipe={r} showAddButton={true} onAdd={addToCart} />
                 ))}
@@ -86,12 +96,14 @@ export default function Favorites() {
                 <View style={styles.cart}>
                     <Text>Cart</Text>
                     <Text>Selected Recipes: {cartIds.length}</Text>
-                    <View style={styles.createShoppingListButton}>
-                    <TouchableOpacity
+                    <View>
+                    <TouchableOpacity style={[styles.createShoppingListButton,
+                        cartIds.length === 0 && {opacity: 0.4},
+                    ]}
                         onPress={handleCreateShoppingList}
                         disabled={cartIds.length === 0}
                         >
-                        <Text>Create Shopping List</Text>
+                        <Text style={{ color: colors.white }}>Create Shopping List</Text>
                     </TouchableOpacity>
                     </View>
                     {shoppingList.length > 0 && (
@@ -113,14 +125,36 @@ export default function Favorites() {
                 </View>
             </View>
         </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    textEmpty: {
+    color: colors.secondarytext,
+    fontSize: 16,
+    lineHeight: 24,
+    padding: 14,
+
+    },
     container: {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundColor: colors.background,
+    },
+    header: {
+        gap: 6,
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        paddingBottom: 15,
+    },
+    favTitle: {
+        fontSize: 30,
+        fontWeight: "800",
+        color: colors.text,
+    },
+    underTitle: {
+        fontSize: 16,
+        color: colors.secondarytext,
     },
     grid: {
         padding: 10,
@@ -137,12 +171,15 @@ const styles = StyleSheet.create({
         width: 240,
         padding: 12,
         margin: 10,
-        backgroundColor: "#ECEDE8",
+        backgroundColor: colors.background,
         borderRadius: 12,
         gap: 10,
+        borderWidth: 2,
+        borderColor: colors.black,
     },
     createShoppingListButton: {
-        backgroundColor: "#D9D9D9",
+        backgroundColor: colors.maindark,
+        color: colors.white,
         padding: 8,
         borderRadius: 8,
         alignItems: "center",

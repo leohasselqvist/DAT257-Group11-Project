@@ -10,13 +10,13 @@ import {
   View,
 } from "react-native";
 import { Edamam } from "../api/apiService";
+import type { RecipeIngredient } from "../api/types";
 import { colors } from "../constants/colors";
 import { FavoritesContext } from "../contexts/FavoritesContext";
 import { RecipeContext } from "../contexts/RecipeContext";
 import { getCurrentUserId } from "../contexts/UserContext";
 import { addFavouriteRecipe, removeFavouriteRecipe } from "../databaseAPI/API";
 import { CO2Button } from "./CO2Button";
-import type { RecipeIngredient } from "../api/types";
 
 
 export type Recipe = {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 20,
     padding: 12,
-    backgroundColor: "#2196F3",
+    backgroundColor: colors.maindark,
   },
   closeButtonText: {
     color: "white",

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getRecipes } from "../../api/recipeApi";
+import type { RecipeIngredient } from "../../api/types";
 import {
   Cuisine,
   DietaryTags,
@@ -21,7 +22,6 @@ import {
 } from "../../api/types";
 import { RecipeCard } from "../../components/RecipeCard";
 import { colors } from "../../constants/colors";
-import type { RecipeIngredient } from "../../api/types";
 type CategoryKey = "All" | "Breakfast" | "Lunch & Dinner" | "Light meal" | "Snack";
 
 const categoryButtons: Array<{ label: CategoryKey; apiValue?: MealType }> = [
