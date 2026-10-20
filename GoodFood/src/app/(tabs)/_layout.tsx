@@ -1,12 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
+import { colors } from "../../constants/colors";
 import { FavoritesProvider } from '../../contexts/FavoritesContext';
 export default function TabLayout() {
   return (
     /*Ger alla flikar som ligger innanför favoritstates*/
     <FavoritesProvider> 
   
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: colors.main, headerShown: false }}>
       <Tabs.Screen
         name="homemenu"
         options={{

@@ -191,16 +191,14 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
       <Image
-        source={require('../../../assets/images/Goodfood_logo_v1.png')}
-        style={{
-          width: 200,
-          height: 80,
-          marginVertical: 16,
-        }}
+        source={require('../../../assets/images/goodfood_logo.png')}
+        style={styles.logotype}
         resizeMode="contain"
       />
-
+      <Text style={styles.catchPhrase}>Good food for the whole week!</Text>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={styles.title}>Welcome, what recipes are you interested in?</Text>
@@ -210,7 +208,7 @@ export default function HomeScreen() {
           <TextInput
             style={styles.searchBar}
             placeholder="Search recipes..."
-            placeholderTextColor="#9A9D96"
+            placeholderTextColor={colors.text}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -322,8 +320,27 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F5",
+    backgroundColor: colors.background,
   },
+  logotype: {
+    width: 140,
+    height: 140,
+  },
+  catchPhrase: {
+    fontSize: 35,
+    fontWeight: "700",
+    color: colors.maindark,
+    flexShrink: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    justifyContent: "center",
+  },
+  
   grid: {
     padding: 10,
     flexDirection: "row",
@@ -334,23 +351,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     fontSize: 24,
     fontWeight: "900",
-    color: "#252824",
+    color: colors.text,
   },
   recommended: {
     paddingHorizontal: 6,
     fontSize: 16,
     fontWeight: "600",
-    color: "#252824",
+    color: colors.secondarytext,
   },
   categoryButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 30,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.buttons,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#FFFFFF",
-    shadowColor: "#000",
+    borderColor: colors.black,
+    borderEndWidth: 3,
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
@@ -365,31 +383,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 6,
+    backgroundColor: colors.white,
   },
   searchBar: {
     flex: 1,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 30,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: colors.black,
     fontSize: 15,
-    color: "#252824",
+    color: colors.black,
+    borderEndEndRadius: 1,
   },
   categoryButtonSelected: {
-    backgroundColor: "#E8F2FF",
-    borderColor: "#8DB9FF",
+    backgroundColor: colors.brown,
+    borderColor: colors.black,
   },
   showMoreButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 30,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.main,
+    color: colors.white,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#ECEDE8",
-    shadowColor: "#000",
+    borderColor: colors.black,
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
@@ -398,7 +419,7 @@ const styles = StyleSheet.create({
   filterGroupTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#252824",
+    color: colors.text,
     marginBottom: 8,
   },
   filterOptions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
@@ -411,14 +432,15 @@ const styles = StyleSheet.create({
   modalView: {
     width: "85%",
     maxHeight: "80%",
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     borderRadius: 20,
+    borderColor: colors.black,
     padding: 20,
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#252824",
+    color: colors.text,
     marginBottom: 16,
   },
   modalActions: { flexDirection: "row", gap: 10, marginTop: 8 },
@@ -427,8 +449,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     overflow: "hidden",
-    backgroundColor: "#F1F1EC",
-    color: "#252824",
+    backgroundColor: colors.borders,
+    color: colors.text,
     fontWeight: "bold",
   },
   applyButton: {
@@ -436,8 +458,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
     overflow: "hidden",
-    backgroundColor: "#2196F3",
-    color: "white",
+    backgroundColor: colors.maindark,
+    color: colors.white,
     fontWeight: "bold",
   },
 });

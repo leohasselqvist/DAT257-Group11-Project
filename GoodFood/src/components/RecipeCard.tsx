@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { colors } from "../constants/colors";
 import { FavoritesContext } from "../contexts/FavoritesContext";
-
 type Ingredient = {
   name: string;
   quantity?: number | string;
@@ -104,6 +104,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
         onPress={() => setModalVisible(true)}
         style={({ pressed }) => [styles.recipeCard, pressed && styles.recipeCardPressed]}
       >
+        <View pointerEvents="none" style={styles.greenTriangle} />
         <View style={styles.recipeInfo}>
           <Text style={styles.recipeTitle}>{recipe.title}</Text>
           <Text style={styles.recipeCals}>{recipe.calories ?? 0} kcal</Text>
@@ -128,14 +129,15 @@ const styles = StyleSheet.create({
     width: 210,
     height: 100,
     borderRadius: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.dirtywhite,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#ECEDE8",
-    shadowColor: "#000",
+    borderColor: colors.black,
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
+    color: colors.text,
   },
   recipeCardPressed: {
     opacity: 0.75,
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   recipeTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#252824",
+    color: colors.text,
     lineHeight: 21,
   },
   recipeTime: {
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
   modalView: {
     width: "85%",
     maxHeight: "75%",
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     borderRadius: 20,
     padding: 20,
     shadowColor: "#000",
@@ -185,22 +187,33 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  greenTriangle: {
+    position: "absolute",
+    height: 0,
+    width: 0,
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: 70,
+    borderLeftWidth: 85,
+    borderLeftColor: "transparent",
+    borderBottomColor: colors.main,
+  },
   modalTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#252824",
+    color: colors.text,
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#252824",
+    color: colors.secondarytext,
     marginTop: 14,
     marginBottom: 8,
   },
   recipeText: {
     fontSize: 15,
-    color: "#3a3f39",
+    color: colors.text,
     lineHeight: 22,
     marginBottom: 6,
   },
@@ -209,7 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#ECEDE8",
+    borderBottomColor: colors.main,
   },
   macroLabel: {
     fontSize: 15,
