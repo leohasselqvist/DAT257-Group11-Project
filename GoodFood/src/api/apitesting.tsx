@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { getRecipes } from "../../api/recipeApi";
-import { DietaryTags, Difficulty, Order, Sort } from "../../api/types";
+import { getRecipes } from "./recipeApi";
+import { DietaryTags, Difficulty, Order, Sort } from "./types";
 
 export default function ApiTesting() {
   useEffect(() => {
