@@ -210,38 +210,18 @@ export default function HomeScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+        </View>
+
+        <View>
+          <Text style={styles.recommended}>Recommended recipes</Text>
+        </View>
+
+        <View style={{ flexDirection: "row", paddingHorizontal: 6, paddingVertical: 6 }}>
           <TouchableOpacity onPress={openFilters}>
             <Text style={[styles.categoryButton, activeFilterCount > 0 && styles.categoryButtonSelected]}>
               Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
             </Text>
           </TouchableOpacity>
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.buttonGap}>
-            {categoryButtons.map((category) => (
-              <TouchableOpacity
-                key={category.label}
-                activeOpacity={0.2}
-                onPress={() => {
-                  setSelectedCategory(category.label);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.categoryButton,
-                    selectedCategory === category.label && styles.categoryButtonSelected,
-                  ]}
-                >
-                  {category.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
-
-        <View>
-          <Text style={styles.recommended}>Recommended recipes</Text>
         </View>
 
         {loading && recipes.length === 0 ? (
@@ -370,11 +350,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
-  },
-  buttonGap: {
-    padding: 6,
-    gap: 6,
-    flexDirection: "row",
   },
   searchRow: {
     flexDirection: "row",
