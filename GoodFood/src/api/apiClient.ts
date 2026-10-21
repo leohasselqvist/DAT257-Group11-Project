@@ -1,4 +1,4 @@
-import { rapidApiKey, recipeApiKey } from "./secret" // IF YOU GET AN ERROR HERE DM LEO
+import { rapidApiKey, recipeApiKey } from "./secret"; // IF YOU GET AN ERROR HERE DM LEO
 
 // Api Client
 
@@ -34,7 +34,7 @@ export async function FetchEdamam<T>(endpoint: string, params?: RequestInit) {
       }});
   
   if (!r.ok) {
-    throw new Error(`[API] Dietly Error: ${r.status}`)
+    throw new Error(`[API] Edamam Error: ${r.status}`)
   }
 
   return r.json();
