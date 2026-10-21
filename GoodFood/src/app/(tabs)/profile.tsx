@@ -163,7 +163,7 @@ function handleLogout(){
           <View style={styles.buttonContainer}>
             <Button
               title={isEditing ? 'SAVE' : 'CHANGE INFORMATION'}
-              color="#f48208"
+              color="#4CAF50"
               onPress={async () => {
                 if (!isEditing) {
                   showMessage('You can now change your information.');
@@ -233,6 +233,7 @@ function handleLogout(){
           
           <Button
               title = {'LOG OUT'} /*text på knappen*/
+              color = "red" /*färg på knappen*/
               onPress={async () => setLogoutModalVisible(true)}
               />
           </View>
@@ -253,7 +254,7 @@ function handleLogout(){
                 <Button
                   title='OK'
                   onPress={() => setModalVisible(false)}
-                  color = "orange"
+                  color = "#4CAF50"
               />
               </View>
             </View>
@@ -271,6 +272,7 @@ function handleLogout(){
                 <Text style = {styles.modalText}>{"Do you want to log out?"}</Text>
                 <Button
                   title='cancel'
+                  color = "#4CAF50"
                   onPress={() => setLogoutModalVisible(false)}
               />
               <Button
