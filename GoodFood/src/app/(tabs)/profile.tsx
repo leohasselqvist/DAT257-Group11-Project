@@ -159,16 +159,12 @@ function handleLogout(){
               editable={isEditing}
             />
   
-
-          <View style={styles.buttonContainer}>
-            <Button
-              title={isEditing ? 'SAVE' : 'CHANGE INFORMATION'}
-              color="#4CAF50"
-              onPress={async () => {
+            <Pressable
+              style={styles.profileButton}
+              onPress= {async () => {
                 if (!isEditing) {
                   showMessage('You can now change your information.');
                   setIsEditing(true);
-
                   return;
                 }
 
@@ -228,17 +224,21 @@ function handleLogout(){
                   console.error(error);
                 }
               }}
-          />
+            >
+              <Text style={styles.profileButtonText}>
+                {isEditing ? 'SAVE' : 'EDIT'}
+              </Text>
+            </Pressable>
 
-          
-          <Button
-              title = {'LOG OUT'} /*text på knappen*/
-              color = "red" /*färg på knappen*/
-              onPress={async () => setLogoutModalVisible(true)}
-              />
+            <Pressable
+              style={styles.logoutButton}
+              onPress={() => setLogoutModalVisible(true)}
+            >
+              <Text style={styles.logoutButtonText}>LOG OUT</Text>
+            </Pressable>
           </View>
 
-
+          <View>
           <Text>{message}</Text>
           <Modal
             animationType = "fade"
@@ -251,11 +251,12 @@ function handleLogout(){
             <View style = {styles.modalCenteredView}> 
               <View style = {styles.modalView}>
                 <Text style = {styles.modalText}>{message}</Text>
-                <Button
-                  title='OK'
+                <Pressable
+                  style={styles.modalOkButton}
                   onPress={() => setModalVisible(false)}
-                  color = "#4CAF50"
-              />
+                >
+                  <Text style = {styles.modalOkButtonText}>OK</Text>
+                </Pressable>
               </View>
             </View>
           </Modal>  
@@ -270,16 +271,20 @@ function handleLogout(){
             <View style = {styles.modalCenteredView}> 
               <View style = {styles.modalView}>
                 <Text style = {styles.modalText}>{"Do you want to log out?"}</Text>
-                <Button
-                  title='cancel'
-                  color = "#4CAF50"
+                <Pressable
+                  style={styles.cancelButton}
                   onPress={() => setLogoutModalVisible(false)}
-              />
-              <Button
-              title="Yes, logout"
-              onPress={handleLogout}
-              color = "red"
-              />
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </Pressable>
+              <Pressable
+                onPress={handleLogout}
+                style={styles.logoutButton}
+              >
+                <Text style={styles.logoutButtonText}>
+                  Yes, logout
+                  </Text>
+              </Pressable>
               </View>
             </View>
           </Modal> 
@@ -304,6 +309,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F8F5',
     paddingVertical: 20,
   },
+
+  logoutButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: 'orange',
+  },
+
+  logoutButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+
   heading: {
     fontSize: 40,
     fontWeight: 'bold',
@@ -329,10 +349,12 @@ const styles = StyleSheet.create({
     color: 'black',
     borderColor: 'black',
   },
+
   buttonContainer: {
     paddingHorizontal: 20,
     marginVertical: 10,
   },
+
   messageContainer: {
     flex: 1, 
     justifyContent: 'center',
@@ -359,7 +381,51 @@ const styles = StyleSheet.create({
     textAlign: 'center', 
     fontSize: 16, 
     color: 'black',
-  }
+  },
+
+  modalOkButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10, // Gör hörnen rundade
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  modalOkButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  profileButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'orange',
+  },
+
+  profileButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    borderColor: "#4CAF50"
+  },
+
+  cancelButton: {
+    backgroundColor: "#226ddc",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  cancelButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });
 
 export default TextInputExample;
